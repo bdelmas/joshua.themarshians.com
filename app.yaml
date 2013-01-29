@@ -1,7 +1,8 @@
 application: joshua-themarshians-com
 version: 1
-runtime: go
-api_version: go1
+runtime: python27
+api_version: 1
+threadsafe: true
 
 default_expiration: "1d"
  
