@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Determining Determinism</title>
+		
+		
+		<meta name="author" content="Joshua Marsh">
+		
+
+		<!-- jQuery for bootstrap. -->
+		<script src="jquery/js/jquery.min.js"></script>
+
+		<!-- These are the style sheets for syntax highlighting. -->
+		<link type="text/css" rel="stylesheet" 
+					href="rainbow/css/github.css"/>
+
+		<!-- Twitter Bootstrap. -->
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap.min.css"/>
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap-responsive.css"/>
+
+		<!-- Our own CSS. -->
+		<link type="text/css" rel="stylesheet" 
+					href="css/blog.css"/>		
+	</head>
+	<body>
+		<div class="container">
+
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="index.html">
+							Non Impediti Ratione Cogitationis
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li >
+									<a href="index.html">
+										<i class="icon-home icon-white"></i>
+										Home
+									</a>
+								</li>
+								<li >
+									<a href="tags.html">
+										<i class="icon-tag icon-white"></i>
+										Tags
+									</a>
+								</li>
+								<li >
+									<a href="archives.html">
+										<i class="icon-hdd icon-white"></i>
+										Archives
+									</a>
+								</li>
+								<li >
+									<a href="about.html">
+										<i class="icon-user icon-white"></i>
+										About
+									</a>
+								</li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			
+      <h1>Determining Determinism</h1>
+
+
+      <p>
+				<small id="entry-date">
+					2012-08-03
+				</small>
+			</p>
+
+<!-- Title: Determining Determinism -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: determinism,memoization,go,recursion -->
+
+<!-- Languages: go,shell -->
+
+<p>I&rsquo;ve always lived by the programming adage, &ldquo;Get it working, then make
+it either readable or fast.&rdquo; When you are developing games or other
+high performance applications, the making it fast part can consume a
+lot of your time.</p>
+
+<p>I can&rsquo;t count the number of hours I&rsquo;ve spent looking at
+<a href="http://en.wikipedia.org/wiki/Call_graph">call graphs</a>. What do you do
+when you&rsquo;ve determined your bottleneck though?  Most people start
+looking at common things like unraveling loops and
+<a href="http://en.wikipedia.org/wiki/Recursion">recursion</a> or creating
+<a href="http://en.wikipedia.org/wiki/Lookup_table">look up tables</a>
+(LUTs). LUTs are a common practice in the gaming industry for things
+like trig functions. Why?  Well, their values are static. The value of
+sin(45°) will always be
+<a href="http://www.wolframalpha.com/input/?i=sin(45+deg">0.7071067812</a>).</p>
+
+<p>There are two reasons that make a LUT useful. First, the cost of
+looking up a value in a hash or array is usually orders of magnitude
+smaller than performing the calculation multiple times. Second, the
+math functions being called are deterministic. Translation: the
+solution will always be the same for a given input.</p>
+
+<p>You may be asking what this has to do with
+<a href="http://en.wikipedia.org/wiki/Deterministic_algorithm">deterministic algorithms</a>. Well,
+you can take the idea of a LUT one step further, but I see this much
+less frequently even though it can be incredibly powerful. Any
+algorithm that is deterministic can have it&rsquo;s own LUT. This is often
+called <a href="http://en.wikipedia.org/wiki/Memoization">memoization</a>, but
+most people don&rsquo;t recognize that it&rsquo;s possible because the function is
+deterministic. Let me show you how it works. A normal fibonacci
+algorithm in <a href="http://golang.org/">go</a> might look like this:</p>
+
+<pre><code data-language="go">func Fibonacci(n int64) int64 {  
+     var f int64  
+     if n <= 1 {  
+          f = 1  
+     } else {  
+          f = Fibonacci(n-1) + Fibonacci(n-2)  
+     }  
+     return f  
+}  
+</code></pre>
+
+<p>This works fine for small values of <em>n</em> like 1 or 7. But when n is 100,
+this could take quite a bit of time to run. Because it&rsquo;s recursive,
+proving that the function is deterministic has huge gains. I&rsquo;ll leave
+the details of the proof to you, but for the sake of this post let&rsquo;s
+just assume it is (it is).</p>
+
+<p>Knowing that this function is deterministic is important! It means we
+can store the previously calculated values and return them or use them
+in calculating new values. Here is one possible way to do this:</p>
+
+<pre><code data-language="go">var fibonacciLUT map[int64]int64
+
+func MemoizedFibonacci(n int64) int64 {  
+     var f int64  
+     if stored, ok := fibonacciLUT[n]; ok {  
+          return stored  
+     }  
+     if n <= 1 {  
+          f = 1  
+     } else {  
+          f = MemoizedFibonacci(n-1) + MemoizedFibonacci(n-2)  
+     }  
+     fibonacciLUT[n] = f  
+     return f  
+}  
+</code></pre>
+
+<p>Not much has changed. First, we create a map (an array could also work
+in this case) to store the values. Next, before we start doing the
+computations, we look to see if we already have a stored result. If we
+do, then we return that. If not, we perform the calculation and save
+the value into our map.</p>
+
+<p>How much does this improve our performance? SO MUCH I HAVE TO USE CAPS
+TO SAY HOW MUCH!</p>
+
+<pre><code data-language="shell">$ go run fibonacci.go  
+50 iterations of Non-memoized took 5m37.824026s to complete.  
+50 iterations of Memoized took 106us to complete.  
+</code></pre>
+
+<p>Yes, you are reading that right. The normal calls took more than five
+minutes to run and the memoized version took 106 microseconds. You can
+see the entire program in <a href="https://gist.github.com/3244972">one of my gists</a>.</p>
+
+<p>So, why am I writing about this. Computer science is important! You
+need to understand things like deterministic algorithms,
+<a href="http://en.wikipedia.org/wiki/State_space_search">state-space graphs</a>,
+and everything else that you may have missed while you were on
+Facebook in your CS classes. They are what separate script kiddies
+from coding ninjas.</p>
+
+<p>You might say, &ldquo;The Zuckster never graduated!&rdquo; I don&rsquo;t care how or
+where you learn it. Whether its <a href="http://mit.edu/">MIT</a>,
+<a href="https://www.coursera.org/">Coursera</a>, or
+<a href="http://www.wikipedia.org/">Wikipedia</a>, good programmers need to
+understand these things. I&rsquo;ve come across too many people who can&rsquo;t
+answer fundamental computer science questions and I&rsquo;ll bet my bottom
+dollar that this problem is directly correlated to why I have to
+maintain unreadable, slow code.</p>
+
+<p>Go forth and learn!</p>
+
+
+
+      <div class="tags">
+				<ul>
+
+          <li><a href="tags.html#determinism">determinism</a></li>
+
+          <li><a href="tags.html#memoization">memoization</a></li>
+
+          <li><a href="tags.html#go">go</a></li>
+
+          <li><a href="tags.html#recursion">recursion</a></li>
+
+				</ul>
+      </div>
+
+
+
+			<footer>
+				<p>
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						<img alt="Creative Commons License" 
+								 style="border-width:0" 
+								 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+					</a>
+					<br />
+					This work is licensed under a 
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						Creative Commons Attribution 3.0 United States License
+					</a>.
+				</p>
+				<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+			</footer>
+		</div>
+
+		<!-- These are the scripts for syntax highlighting. -->
+		<script src="rainbow/js/rainbow.min.js"></script>
+		<script src="rainbow/js/language/generic.js"></script>
+		
+		<script src="rainbow/js/language/go.js"></script>
+		
+		<script src="rainbow/js/language/shell.js"></script>
+		
+
+		<!-- Twitter Bootstrap. -->
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>

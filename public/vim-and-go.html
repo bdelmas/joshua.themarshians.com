@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Vim and Go</title>
+		
+		
+		<meta name="author" content="Joshua Marsh">
+		
+
+		<!-- jQuery for bootstrap. -->
+		<script src="jquery/js/jquery.min.js"></script>
+
+		<!-- These are the style sheets for syntax highlighting. -->
+		<link type="text/css" rel="stylesheet" 
+					href="rainbow/css/github.css"/>
+
+		<!-- Twitter Bootstrap. -->
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap.min.css"/>
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap-responsive.css"/>
+
+		<!-- Our own CSS. -->
+		<link type="text/css" rel="stylesheet" 
+					href="css/blog.css"/>		
+	</head>
+	<body>
+		<div class="container">
+
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="index.html">
+							Non Impediti Ratione Cogitationis
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li >
+									<a href="index.html">
+										<i class="icon-home icon-white"></i>
+										Home
+									</a>
+								</li>
+								<li >
+									<a href="tags.html">
+										<i class="icon-tag icon-white"></i>
+										Tags
+									</a>
+								</li>
+								<li >
+									<a href="archives.html">
+										<i class="icon-hdd icon-white"></i>
+										Archives
+									</a>
+								</li>
+								<li >
+									<a href="about.html">
+										<i class="icon-user icon-white"></i>
+										About
+									</a>
+								</li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			
+      <h1>Vim and Go</h1>
+
+
+      <p>
+				<small id="entry-date">
+					2013-01-09
+				</small>
+			</p>
+
+<!-- Title: Vim and Go -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: vim,go -->
+
+<!-- Languages: shell,go,html,perl -->
+
+<p>I grew up on <a href="http://www.gnu.org/software/emacs/">Emacs</a> and
+<a href="http://www.gnu.org/software/bash/">Bash</a>. I love them dearly (I have
+the pinky fingers to prove it). I&rsquo;m not so blinded by my faith in them
+though that I won&rsquo;t occasionally try new things. I&rsquo;ve heard a lot of
+good things about <a href="http://www.zsh.org/">Zsh</a> and I&rsquo;ve found myself
+connecting to many a servers that have <a href="http://www.vim.org/">Vim</a>
+installed but not Emacs. So, I thought I&rsquo;d give them a try.</p>
+
+<p>Of course, my new pet programming language is
+<a href="http://golang.org/">Go</a>, so I thought I&rsquo;d try and get some basic
+functionality for Go working with Vim. I&rsquo;m pleased to say the process
+was rather simple, but some of the documentation I found online was
+somewhat outdated (the readmes were up to date but hard to find). I
+thought I&rsquo;d share what I did, if nothing else so I can remember if I
+ever have to do it again.</p>
+
+<p>First, if you are like me and don&rsquo;t have Vim installed on your system,
+you should get that setup. On
+<a href="https://www.archlinux.org/">Arch Linux</a>, you can:</p>
+
+<pre><code data-language="shell">sudo pacman -S gvim
+</code></pre>
+
+<p>This will install the GUI version of Vim as well as the console
+version. Next, you&rsquo;ll want to update your <em>~/.vimrc</em> file to use Go&rsquo;s
+Vim tools. They come standard with the installation, you just need to
+setup Vim to use them. Append the following to your <em>~/.vimrc</em> file:</p>
+
+<pre><code data-language="shell">set rtp+=$GOROOT/misc/vim
+filetype plugin indent on
+syntax on
+</code></pre>
+
+<p>You&rsquo;ll want to replace <em>$GOROOT</em> with the path to Go&rsquo;s share items (in
+Arch Linux, it is <em>/usr/share/go</em>). This will give you fairly useful
+features like syntax highlighting proper indentation, and
+documentation.</p>
+
+<p><img src="img/vim-godoc.png" alt="vim an godoc" />
+</p>
+
+<p>I was also interested in auto-completion as I use it quite often in
+Emacs. Fortunately, <a href="https://github.com/nsf/gocode">Gocode</a> provides
+functionality for vim as well. Setting it up was simple. If you
+haven&rsquo;t used Gocode before, you&rsquo;ll need to install it&rsquo;s daemon:</p>
+
+<pre><code data-language="shell">go get -u github.com/nsf/gocode
+</code></pre>
+
+<p>If you don&rsquo;t have your <em>$GOPATH*s bin folder in your path, you&rsquo;ll need
+to add that. My *.zshrc</em> file has these lines that do just that:</p>
+
+<pre><code data-language="shell">export GOPATH="${HOME}/go"
+export GOBIN="${GOPATH}/bin"
+export PATH="${PATH}:${GOBIN}"
+</code></pre>
+
+<p>With those steps completed, run the setup script provided:</p>
+
+<pre><code data-language="shell">cd $GOPATH/src/github.com/nsf/gocode/vim
+./update.bash
+</code></pre>
+
+<p>Finally, append the following to your <em>~/.vimrc</em>:</p>
+
+<pre><code data-language="shell">filetype plugin on
+</code></pre>
+
+<p>Now, when you are typing a command and aren&rsquo;t quite sure what should
+come next or want to see what the function parameters are, simply use
+&lt;C-x&gt;&lt;C-o&gt; and Gocode will give you a list of possibly completion
+commands. If you install packages, it will even auto-complete from
+those (assuming they are in your <em>$GOPATH/pkg</em> directory).</p>
+
+<p><img src="img/gocode.png" alt="gocode" />
+</p>
+
+<p>So far, I have been impressed with how Vim and Go interact. It was
+fairly simple to setup considering I haven&rsquo;t ever used Vim except for
+the most basic viewing and editing. I&rsquo;m not ready to leave Emacs just
+yet, but Vim and Go have certainly been fun and I&rsquo;ll keep at it for a
+while to see how close I can get to my keyboard-fu with Emacs.</p>
+
+<p>If you have other cool things you are doing with Vim and Go that you
+think would impress me, let me know! I&rsquo;m still new to Vim, so I&rsquo;d love
+any feedback.</p>
+
+
+
+      <div class="tags">
+				<ul>
+
+          <li><a href="tags.html#vim">vim</a></li>
+
+          <li><a href="tags.html#go">go</a></li>
+
+				</ul>
+      </div>
+
+
+
+			<footer>
+				<p>
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						<img alt="Creative Commons License" 
+								 style="border-width:0" 
+								 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+					</a>
+					<br />
+					This work is licensed under a 
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						Creative Commons Attribution 3.0 United States License
+					</a>.
+				</p>
+				<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+			</footer>
+		</div>
+
+		<!-- These are the scripts for syntax highlighting. -->
+		<script src="rainbow/js/rainbow.min.js"></script>
+		<script src="rainbow/js/language/generic.js"></script>
+		
+		<script src="rainbow/js/language/shell.js"></script>
+		
+		<script src="rainbow/js/language/go.js"></script>
+		
+		<script src="rainbow/js/language/html.js"></script>
+		
+		<script src="rainbow/js/language/perl.js"></script>
+		
+
+		<!-- Twitter Bootstrap. -->
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>

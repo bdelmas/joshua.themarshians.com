@@ -1,0 +1,28 @@
+      <h1>Site Tags</h1>
+      <p class="date">
+				Last updated: {{.CDate}}
+			</p>
+
+			<h2>Table of Contents</h2>
+      <div class="tags-list">
+				<ul>
+{{range .Tags}}
+          <li><a href="#{{.Name}}">{{.Name}}</a></li>
+{{end}}
+				</ul>
+      </div>
+
+			<h2>List of Tags</h2>
+      <div class="tags-details">
+{{range .Tags}}
+        <div class="tag-detail">
+					<a name="{{.Name}}"></a>
+					<h3>{{.Name}}</h3>
+					<ul>
+{{range .Entries}}
+						<li><a href="{{.Url}}">{{.Title}}</a></li>
+{{end}}
+					</ul>
+				</div>
+{{end}}
+			</div>

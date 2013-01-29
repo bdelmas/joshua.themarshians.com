@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Go App, Do You Read Me?</title>
+		
+		
+		<meta name="author" content="Joshua Marsh">
+		
+
+		<!-- jQuery for bootstrap. -->
+		<script src="jquery/js/jquery.min.js"></script>
+
+		<!-- These are the style sheets for syntax highlighting. -->
+		<link type="text/css" rel="stylesheet" 
+					href="rainbow/css/github.css"/>
+
+		<!-- Twitter Bootstrap. -->
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap.min.css"/>
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap-responsive.css"/>
+
+		<!-- Our own CSS. -->
+		<link type="text/css" rel="stylesheet" 
+					href="css/blog.css"/>		
+	</head>
+	<body>
+		<div class="container">
+
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="index.html">
+							Non Impediti Ratione Cogitationis
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li >
+									<a href="index.html">
+										<i class="icon-home icon-white"></i>
+										Home
+									</a>
+								</li>
+								<li >
+									<a href="tags.html">
+										<i class="icon-tag icon-white"></i>
+										Tags
+									</a>
+								</li>
+								<li >
+									<a href="archives.html">
+										<i class="icon-hdd icon-white"></i>
+										Archives
+									</a>
+								</li>
+								<li >
+									<a href="about.html">
+										<i class="icon-user icon-white"></i>
+										About
+									</a>
+								</li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			
+      <h1>Go App, Do You Read Me?</h1>
+
+
+      <p>
+				<small id="entry-date">
+					2013-01-17
+				</small>
+			</p>
+
+<!-- Title: Go App, Do You Read Me? -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: rpc,go,linux -->
+
+<!-- Languages: shell,go -->
+
+<p>I am now running a few personal <a href="http://golang.org/">Go</a> applications
+and am working on a Go web application that will eventually be ready
+for public consumption. Since Go gives us the ability to act as a
+<a href="http://www.fastcgi.com/drupal/">FastCGI</a> backend or a
+<a href="http://golang.org/pkg/net/http/">stand alone web application</a>, it
+only seems reasonable that in a production system you&rsquo;d want the
+ability to use it like any other web server. This includes the ability
+to reload the configuration on the fly and start and stop the
+application.</p>
+
+<p>I thought I&rsquo;d put together an example of how I&rsquo;m doing it right
+now. From what I&rsquo;ve been able to gather,
+<a href="http://en.wikipedia.org/wiki/Remote_procedure_call">RPC</a> seems to be
+the best way to interact with your application. If you are wanting to
+run the application yourself, you can try it by doing:</p>
+
+<pre><code data-language="shell">git clone https://github.com/icub3d/go-ipc-with-rpc.git
+cd go-ipc-with-rpc/servicer
+go install  
+cd ../greeter  
+go install  
+cd ..  
+emacs greeter.service
+# Modify greeter.service to use the path to your GOBIN where the   
+# above apps were installed.  
+sudo cp greeter.services /etc/systemd/system  
+cp config.json /tmp  
+</code></pre>
+
+<p>You can then run it and test if like so:</p>
+
+<pre><code data-language="shell">$ sudo systemctl start greeter  
+$ curl http://localhost:9000  
+Howdy Doodie!  
+$ emacs /tmp/config.json  
+$ sudo systemctl reload greeter  
+$ curl http://localhost:9000  
+Hey there, partner!  
+$ sudo systemctl stop greeter  
+$ curl http://localhost:9000  
+curl: (7) couldn't connect to host at localhost:9000  
+</code></pre>
+
+<p>At a high level there are three parts to the application. The first
+part is the web application itself which can be found in the greeter
+directory. The second is a helper application that makes RPC calls to
+the greeter. It can be found in the servicer directory. Finally, we
+have a default configuration for the greeter application and a systemd
+service configuration file.</p>
+
+<p>Within the greeter application, I&rsquo;ve divided the code into four
+parts. The file
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/config.go">config.go</a>
+manages reading the config file and translating it into a map that the
+rest of the application can use. Using a <a href="http://www.json.org/">JSON</a>
+config file makes reading and loading the configuration unbelievably
+simple. I also use a <a href="http://golang.org/pkg/sync/#Mutex">mutex</a> to
+protect access to the configuration while it is being reloaded.</p>
+
+<p>The file
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/main.go">flag.go</a>
+just initializes the command line flags for parsing. It isn&rsquo;t really
+related to this post, but it was helpful during testing because I
+could point to various configuration files. Under normal
+circumstances, you&rsquo;d likely have more complex flags or maybe none at
+all.</p>
+
+<p>The file
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/main.go">main.go</a>
+contains the main function which starts up the application. It first
+parses the command line flags and then reads the configuration
+file. It then starts the listener for our web application. Next, we
+start the RPC services. We pass the web application&rsquo;s listener to this
+function so that the RPC services know which listener to interact
+with. Finally, we setup our web server.</p>
+
+<p>The last file in the greeter application is
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/rpc.go">rpc.go</a>,
+which is the meat of what I wanted to talk about. If this looks
+foreign to you, don&rsquo;t fret. Go has some great <a href="http://golang.org/pkg/net/rpc/">documentation</a> on using
+RPC. We create a ServiceHandler struct which will manage all of the
+RPC calls. RPC requires a very specific method definition, so even
+though we don&rsquo;t use the incoming arguments, they need to be present. I
+used an integer for simplicity.</p>
+
+<p>The Stop function checks to see if the listener is available and if so
+closes it. This has the net effect of stopping the web application
+because the <a href="http://golang.org/pkg/net/http/#Serve">http.Serve</a>
+function exits when the listener is closed. The Reload function is
+equally simple because we need only call the ReadConfig function
+again.</p>
+
+<p>The StartRPC function is what sets up the RPC service. You register
+objects with the <a href="http://golang.org/pkg/net/rpc/">rpc</a> package and
+then it takes care of determining which functions meet the criteria of
+being exposed. In our case we register a ServiceHandler. We then set
+up RPC to handle HTTP requests and open up a port to listen for those
+request. Finally, we use the http&rsquo;s Serve function to start accepting
+connections to the RPC service.</p>
+
+<p>With that done, we now just need some way to talk to the RPC
+service. I wrote a little helper application that does this in the
+servicer directory. It is all contained in
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/servicer/servicer.go">servicer.go</a>. First,
+it gets our operation from the command line and translates that into
+the RPC method we want to call. Next, we create a client RPC
+connection with the
+<a href="http://golang.org/pkg/net/rpc/#DialHTTP">DialHTTP</a> function. We then
+use the client to <a href="http://golang.org/pkg/net/rpc/#Client.Call">Call</a> the method we wanted.</p>
+
+<p>Now all that remains is to hook it up into your service manager. I run
+<a href="https://www.archlinux.org/">Arch Linux</a> and use <a href="http://www.freedesktop.org/wiki/Software/systemd">systemd</a>. If you run
+another service manager, you&rsquo;ll have to set up your own configuration
+for it. I&rsquo;ve provided a <a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter.service">greeter.service</a> which starts up the greeter
+application and uses the servicer to reload and stop the application.</p>
+
+<p>Overall, I&rsquo;m extremely happy with the outcome. I can see this being a
+common pattern and plan to eventually make a package out of it. If for
+some reason all my links above weren&rsquo;t enough, here is where I got
+most of my information from and my example:</p>
+
+<ul>
+<li><a href="http://golang.org/pkg/net/rpc/">Go&rsquo;s RPC Documentation</a></li>
+<li><a href="http://www.freedesktop.org/software/systemd/man/systemd.service.html">Systemd&rsquo;s Service Configuration Options</a></li>
+<li><a href="https://github.com/icub3d/go-ipc-with-rpc">My Completed Example</a></li>
+</ul>
+
+<h2>Updates</h2>
+
+<p>There was some discussion about the security of using RPC. RPC itself
+doesn&rsquo;t care about security so that can leave you open to
+attack. Obviously a firewall would help solve this. Alternatively, you
+can use a named pipe instead of a socket and go&rsquo;s rpc package will use
+it just the same.</p>
+
+
+
+      <div class="tags">
+				<ul>
+
+          <li><a href="tags.html#rpc">rpc</a></li>
+
+          <li><a href="tags.html#go">go</a></li>
+
+          <li><a href="tags.html#linux">linux</a></li>
+
+				</ul>
+      </div>
+
+
+
+			<footer>
+				<p>
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						<img alt="Creative Commons License" 
+								 style="border-width:0" 
+								 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+					</a>
+					<br />
+					This work is licensed under a 
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						Creative Commons Attribution 3.0 United States License
+					</a>.
+				</p>
+				<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+			</footer>
+		</div>
+
+		<!-- These are the scripts for syntax highlighting. -->
+		<script src="rainbow/js/rainbow.min.js"></script>
+		<script src="rainbow/js/language/generic.js"></script>
+		
+		<script src="rainbow/js/language/shell.js"></script>
+		
+		<script src="rainbow/js/language/go.js"></script>
+		
+
+		<!-- Twitter Bootstrap. -->
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>

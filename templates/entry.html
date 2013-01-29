@@ -1,0 +1,21 @@
+{{if .Title}}
+      <h1>{{.Title}}</h1>
+{{end}}
+
+      <p>
+				<small id="entry-date">
+					{{.CDate}}{{if .UDate}} (Updated: {{.UDate}}){{end}}
+				</small>
+			</p>
+
+{{.Content}}
+
+{{if .Tags}}
+      <div class="tags">
+				<ul>
+{{range .Tags}}
+          <li><a href="tags.html#{{.}}">{{.}}</a></li>
+{{end}}
+				</ul>
+      </div>
+{{end}}

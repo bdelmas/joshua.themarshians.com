@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Index</title>
+		
+		
+
+		<!-- jQuery for bootstrap. -->
+		<script src="jquery/js/jquery.min.js"></script>
+
+		<!-- These are the style sheets for syntax highlighting. -->
+		<link type="text/css" rel="stylesheet" 
+					href="rainbow/css/github.css"/>
+
+		<!-- Twitter Bootstrap. -->
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap.min.css"/>
+		<link type="text/css" rel="stylesheet" 
+					href="bootstrap/css/bootstrap-responsive.css"/>
+
+		<!-- Our own CSS. -->
+		<link type="text/css" rel="stylesheet" 
+					href="css/blog.css"/>		
+	</head>
+	<body>
+		<div class="container">
+
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="index.html">
+							Non Impediti Ratione Cogitationis
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li class="active">
+									<a href="index.html">
+										<i class="icon-home icon-white"></i>
+										Home
+									</a>
+								</li>
+								<li >
+									<a href="tags.html">
+										<i class="icon-tag icon-white"></i>
+										Tags
+									</a>
+								</li>
+								<li >
+									<a href="archives.html">
+										<i class="icon-hdd icon-white"></i>
+										Archives
+									</a>
+								</li>
+								<li >
+									<a href="about.html">
+										<i class="icon-user icon-white"></i>
+										About
+									</a>
+								</li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			
+<div class="row">
+	<div class="span12">
+		
+		<h1>Go App, Do You Read Me?</h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2013-01-17
+			</small>
+		</p>
+
+		<!-- Title: Go App, Do You Read Me? -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: rpc,go,linux -->
+
+<!-- Languages: shell,go -->
+
+<p>I am now running a few personal <a href="http://golang.org/">Go</a> applications
+and am working on a Go web application that will eventually be ready
+for public consumption. Since Go gives us the ability to act as a
+<a href="http://www.fastcgi.com/drupal/">FastCGI</a> backend or a
+<a href="http://golang.org/pkg/net/http/">stand alone web application</a>, it
+only seems reasonable that in a production system you&rsquo;d want the
+ability to use it like any other web server. This includes the ability
+to reload the configuration on the fly and start and stop the
+application.</p>
+
+<p>I thought I&rsquo;d put together an example of how I&rsquo;m doing it right
+now. From what I&rsquo;ve been able to gather,
+<a href="http://en.wikipedia.org/wiki/Remote_procedure_call">RPC</a> seems to be
+the best way to interact with your application. If you are wanting to
+run the application yourself, you can try it by doing:</p>
+
+<pre><code data-language="shell">git clone https://github.com/icub3d/go-ipc-with-rpc.git
+cd go-ipc-with-rpc/servicer
+go install  
+cd ../greeter  
+go install  
+cd ..  
+emacs greeter.service
+# Modify greeter.service to use the path to your GOBIN where the   
+# above apps were installed.  
+sudo cp greeter.services /etc/systemd/system  
+cp config.json /tmp  
+</code></pre>
+
+<p>You can then run it and test if like so:</p>
+
+<pre><code data-language="shell">$ sudo systemctl start greeter  
+$ curl http://localhost:9000  
+Howdy Doodie!  
+$ emacs /tmp/config.json  
+$ sudo systemctl reload greeter  
+$ curl http://localhost:9000  
+Hey there, partner!  
+$ sudo systemctl stop greeter  
+$ curl http://localhost:9000  
+curl: (7) couldn't connect to host at localhost:9000  
+</code></pre>
+
+<p>At a high level there are three parts to the application. The first
+part is the web application itself which can be found in the greeter
+directory. The second is a helper application that makes RPC calls to
+the greeter. It can be found in the servicer directory. Finally, we
+have a default configuration for the greeter application and a systemd
+service configuration file.</p>
+
+<p>Within the greeter application, I&rsquo;ve divided the code into four
+parts. The file
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/config.go">config.go</a>
+manages reading the config file and translating it into a map that the
+rest of the application can use. Using a <a href="http://www.json.org/">JSON</a>
+config file makes reading and loading the configuration unbelievably
+simple. I also use a <a href="http://golang.org/pkg/sync/#Mutex">mutex</a> to
+protect access to the configuration while it is being reloaded.</p>
+
+<p>The file
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/main.go">flag.go</a>
+just initializes the command line flags for parsing. It isn&rsquo;t really
+related to this post, but it was helpful during testing because I
+could point to various configuration files. Under normal
+circumstances, you&rsquo;d likely have more complex flags or maybe none at
+all.</p>
+
+<p>The file
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/main.go">main.go</a>
+contains the main function which starts up the application. It first
+parses the command line flags and then reads the configuration
+file. It then starts the listener for our web application. Next, we
+start the RPC services. We pass the web application&rsquo;s listener to this
+function so that the RPC services know which listener to interact
+with. Finally, we setup our web server.</p>
+
+<p>The last file in the greeter application is
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter/rpc.go">rpc.go</a>,
+which is the meat of what I wanted to talk about. If this looks
+foreign to you, don&rsquo;t fret. Go has some great <a href="http://golang.org/pkg/net/rpc/">documentation</a> on using
+RPC. We create a ServiceHandler struct which will manage all of the
+RPC calls. RPC requires a very specific method definition, so even
+though we don&rsquo;t use the incoming arguments, they need to be present. I
+used an integer for simplicity.</p>
+
+<p>The Stop function checks to see if the listener is available and if so
+closes it. This has the net effect of stopping the web application
+because the <a href="http://golang.org/pkg/net/http/#Serve">http.Serve</a>
+function exits when the listener is closed. The Reload function is
+equally simple because we need only call the ReadConfig function
+again.</p>
+
+<p>The StartRPC function is what sets up the RPC service. You register
+objects with the <a href="http://golang.org/pkg/net/rpc/">rpc</a> package and
+then it takes care of determining which functions meet the criteria of
+being exposed. In our case we register a ServiceHandler. We then set
+up RPC to handle HTTP requests and open up a port to listen for those
+request. Finally, we use the http&rsquo;s Serve function to start accepting
+connections to the RPC service.</p>
+
+<p>With that done, we now just need some way to talk to the RPC
+service. I wrote a little helper application that does this in the
+servicer directory. It is all contained in
+<a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/servicer/servicer.go">servicer.go</a>. First,
+it gets our operation from the command line and translates that into
+the RPC method we want to call. Next, we create a client RPC
+connection with the
+<a href="http://golang.org/pkg/net/rpc/#DialHTTP">DialHTTP</a> function. We then
+use the client to <a href="http://golang.org/pkg/net/rpc/#Client.Call">Call</a> the method we wanted.</p>
+
+<p>Now all that remains is to hook it up into your service manager. I run
+<a href="https://www.archlinux.org/">Arch Linux</a> and use <a href="http://www.freedesktop.org/wiki/Software/systemd">systemd</a>. If you run
+another service manager, you&rsquo;ll have to set up your own configuration
+for it. I&rsquo;ve provided a <a href="https://github.com/icub3d/go-ipc-with-rpc/blob/master/greeter.service">greeter.service</a> which starts up the greeter
+application and uses the servicer to reload and stop the application.</p>
+
+<p>Overall, I&rsquo;m extremely happy with the outcome. I can see this being a
+common pattern and plan to eventually make a package out of it. If for
+some reason all my links above weren&rsquo;t enough, here is where I got
+most of my information from and my example:</p>
+
+<ul>
+<li><a href="http://golang.org/pkg/net/rpc/">Go&rsquo;s RPC Documentation</a></li>
+<li><a href="http://www.freedesktop.org/software/systemd/man/systemd.service.html">Systemd&rsquo;s Service Configuration Options</a></li>
+<li><a href="https://github.com/icub3d/go-ipc-with-rpc">My Completed Example</a></li>
+</ul>
+
+<h2>Updates</h2>
+
+<p>There was some discussion about the security of using RPC. RPC itself
+doesn&rsquo;t care about security so that can leave you open to
+attack. Obviously a firewall would help solve this. Alternatively, you
+can use a named pipe instead of a socket and go&rsquo;s rpc package will use
+it just the same.</p>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#rpc">rpc</a></li>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+				<li><a href="tags.html#linux">linux</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+<div class="row">
+	<div class="span12">
+		
+		<h1>Vim and Go</h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2013-01-09
+			</small>
+		</p>
+
+		<!-- Title: Vim and Go -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: vim,go -->
+
+<!-- Languages: shell,go,html,perl -->
+
+<p>I grew up on <a href="http://www.gnu.org/software/emacs/">Emacs</a> and
+<a href="http://www.gnu.org/software/bash/">Bash</a>. I love them dearly (I have
+the pinky fingers to prove it). I&rsquo;m not so blinded by my faith in them
+though that I won&rsquo;t occasionally try new things. I&rsquo;ve heard a lot of
+good things about <a href="http://www.zsh.org/">Zsh</a> and I&rsquo;ve found myself
+connecting to many a servers that have <a href="http://www.vim.org/">Vim</a>
+installed but not Emacs. So, I thought I&rsquo;d give them a try.</p>
+
+<p>Of course, my new pet programming language is
+<a href="http://golang.org/">Go</a>, so I thought I&rsquo;d try and get some basic
+functionality for Go working with Vim. I&rsquo;m pleased to say the process
+was rather simple, but some of the documentation I found online was
+somewhat outdated (the readmes were up to date but hard to find). I
+thought I&rsquo;d share what I did, if nothing else so I can remember if I
+ever have to do it again.</p>
+
+<p>First, if you are like me and don&rsquo;t have Vim installed on your system,
+you should get that setup. On
+<a href="https://www.archlinux.org/">Arch Linux</a>, you can:</p>
+
+<pre><code data-language="shell">sudo pacman -S gvim
+</code></pre>
+
+<p>This will install the GUI version of Vim as well as the console
+version. Next, you&rsquo;ll want to update your <em>~/.vimrc</em> file to use Go&rsquo;s
+Vim tools. They come standard with the installation, you just need to
+setup Vim to use them. Append the following to your <em>~/.vimrc</em> file:</p>
+
+<pre><code data-language="shell">set rtp+=$GOROOT/misc/vim
+filetype plugin indent on
+syntax on
+</code></pre>
+
+<p>You&rsquo;ll want to replace <em>$GOROOT</em> with the path to Go&rsquo;s share items (in
+Arch Linux, it is <em>/usr/share/go</em>). This will give you fairly useful
+features like syntax highlighting proper indentation, and
+documentation.</p>
+
+<p><img src="img/vim-godoc.png" alt="vim an godoc" />
+</p>
+
+<p>I was also interested in auto-completion as I use it quite often in
+Emacs. Fortunately, <a href="https://github.com/nsf/gocode">Gocode</a> provides
+functionality for vim as well. Setting it up was simple. If you
+haven&rsquo;t used Gocode before, you&rsquo;ll need to install it&rsquo;s daemon:</p>
+
+<pre><code data-language="shell">go get -u github.com/nsf/gocode
+</code></pre>
+
+<p>If you don&rsquo;t have your <em>$GOPATH*s bin folder in your path, you&rsquo;ll need
+to add that. My *.zshrc</em> file has these lines that do just that:</p>
+
+<pre><code data-language="shell">export GOPATH="${HOME}/go"
+export GOBIN="${GOPATH}/bin"
+export PATH="${PATH}:${GOBIN}"
+</code></pre>
+
+<p>With those steps completed, run the setup script provided:</p>
+
+<pre><code data-language="shell">cd $GOPATH/src/github.com/nsf/gocode/vim
+./update.bash
+</code></pre>
+
+<p>Finally, append the following to your <em>~/.vimrc</em>:</p>
+
+<pre><code data-language="shell">filetype plugin on
+</code></pre>
+
+<p>Now, when you are typing a command and aren&rsquo;t quite sure what should
+come next or want to see what the function parameters are, simply use
+&lt;C-x&gt;&lt;C-o&gt; and Gocode will give you a list of possibly completion
+commands. If you install packages, it will even auto-complete from
+those (assuming they are in your <em>$GOPATH/pkg</em> directory).</p>
+
+<p><img src="img/gocode.png" alt="gocode" />
+</p>
+
+<p>So far, I have been impressed with how Vim and Go interact. It was
+fairly simple to setup considering I haven&rsquo;t ever used Vim except for
+the most basic viewing and editing. I&rsquo;m not ready to leave Emacs just
+yet, but Vim and Go have certainly been fun and I&rsquo;ll keep at it for a
+while to see how close I can get to my keyboard-fu with Emacs.</p>
+
+<p>If you have other cool things you are doing with Vim and Go that you
+think would impress me, let me know! I&rsquo;m still new to Vim, so I&rsquo;d love
+any feedback.</p>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#vim">vim</a></li>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+<div class="row">
+	<div class="span12">
+		
+		<h1>Private Git Repos And Go</h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2012-12-23
+			</small>
+		</p>
+
+		<!-- Title: Private Git Repos And Go -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: git,go -->
+
+<!-- Languages: shell,go,html,perl -->
+
+<p>I spent a little bit of time this weekend tinkering on a small project
+I&rsquo;ve been thinking about for quite a while. Google&rsquo;s new(ish) language
+Go seemed like a good candidate for the project. One of the great
+features of <a href="http://golang.org/">Go</a> is that your can import external
+code sources relatively easily. I have a small private repository at
+home and I wanted to simplify the process of importing the code and
+maintaining the repositories. In the end, I chose
+<a href="https://github.com/sitaramc/gitolite">Gitolite</a> +
+<a href="https://git.wiki.kernel.org/index.php/Gitweb">Gitweb</a> on an
+<a href="https://www.archlinux.org/">Arch</a> Linux system. Here is how I did it.</p>
+
+<h2>Preparations</h2>
+
+<p>Since we are using git, you&rsquo;ll want to make sure you have that
+installed. We will also be using
+<a href="http://httpd.apache.org/">Apache httpd</a> for gitweb and to facilitate
+go&rsquo;s remote import mechanism. On an Arch Linux system, you can do that
+in a terminal with:</p>
+
+<pre><code data-language="shell">pacman -S git apache  
+</code></pre>
+
+<p>The git package will create a git user that we will use during this
+process. The user needs a little help though. As root:</p>
+
+<pre><code data-language="shell">usermod -d /srv/git git
+passwd -d git
+</code></pre>
+
+<p>We are simply telling the system that the users home directory should
+be <em>/srv/git</em> and it should not have a password (i.e. can&rsquo;t log
+in). Make the home directory and give it the proper permissions:</p>
+
+<pre><code data-language="shell">mkdir /srv/git
+chown git.git /srv/git
+chmod 750 /srv/git
+</code></pre>
+
+<p>We also want the http user to be in the git group so that gitweb can
+read files from <em>/srv/git</em> and then restart httpd. You can do this by
+running the following commands:</p>
+
+<pre><code data-language="shell">usermod -a -G git http
+systemctl restart httpd.service
+</code></pre>
+
+<p>From this point on, I&rsquo;ll presume you are using the git user and are in
+his <em>$HOME</em> directory unless otherwise specified.</p>
+
+<h2>Gitolite</h2>
+
+<p>Gitolite is a great git repository management tool that is used by
+quite a few high profile project (e.g. the
+<a href="http://git.kernel.org/">Linux kernel</a>). The big advantages it has
+over using the standard git tools like
+<a href="http://www.kernel.org/pub/software/scm/git/docs/git-daemon.html">git-daemon</a>
+or
+<a href="http://www.kernel.org/pub/software/scm/git/docs/git-http-backend.html">git-http-backend</a>
+is that it is extremely simple to use and you can manage it remotely
+once it is setup.</p>
+
+<p>I simply pull the latest from <a href="https://github.com/">GitHub</a> and do the
+install:</p>
+
+<pre><code data-language="shell">git clone git://github.com/sitaramc/gitolite
+mkdir $HOME/bin
+gitolite/install -ln
+</code></pre>
+
+<p>Gitolite uses SSH for authentication via public keys. As such, you&rsquo;ll
+want to have your public key somewhere on the system. I copied mine to
+<em>/tmp/username.pub</em>. Make sure your file&rsquo;s base name is the name of the
+user you plan to log in with when accessing the repositories. Then run
+the setup:</p>
+
+<pre><code data-language="shell">bin/gitolite setup /tmp/username.pub
+</code></pre>
+
+<p>I made a few changes in <em>$HOME/.gitolite.rc</em> to facilitate httpd being
+able to access the repositories. Modify the <em>UMASK</em> and
+<em>GIT_CONFIG_KEYS</em> to:</p>
+
+<pre><code data-language="shell">UMASK           => 0027,
+GIT_CONFIG_KEYS => 'gitweb\.(owner|description|category)*',
+</code></pre>
+
+<p>This will give the git group the ability to read the repositories and allow the gitolite configuration file to store some basic gitweb configuration options. Finally, make sure that the repositories path is accessible by the git group:</p>
+
+<pre><code data-language="shell">chmod g+rx repositories
+</code></pre>
+
+<p>Gitolite is ready to use! You configure it and setup repositories by cloning the gitolite-admin repository:</p>
+
+<pre><code data-language="shell">git clone git@git.hostname.com:gitolite-admin
+</code></pre>
+
+<p>Here is my <em>conf/gitolite.conf</em> file:</p>
+
+<pre><code data-language="shell">@webs = config testing
+
+repo gitolite-admin
+    RW+     =   jmarsh
+
+repo config
+    RW+     =   jmarsh
+  config gitweb.owner = joshua@themarshians.com
+  config gitweb.description = A recursive JSON config parser.
+
+repo testing
+    RW+     =   @all
+  config gitweb.owner = joshua@themarshians.com
+  config gitweb.description = A test playground for connection and gitolite.
+
+repo @webs
+  R       =   gitweb
+</code></pre>
+
+<p>I setup the <em>@webs</em> group to allow gitolite to manage the projects
+list. The user <em>gitweb</em> is a special user for gitolite. Any repository
+that givea that user read (R) permissions will be added to the file
+<em>$HOME/projects.list</em>. Gitweb can then use this file to display the
+repositories you want visible. Any repositories that you want gitweb
+to display simply need to be added to the <em>@webs</em> group. You can see
+Gitolite&rsquo;s documentation for more information on what the rest of the
+configurations mean.</p>
+
+<p>Once you are satisfied with your configurations, commit the changes
+and push it back to the server. Gitolite will do the rest, including
+creating new repositories as necessary. Remember, gitolite will use
+the SSH public key you gave it for authentication, so make sure you
+are pushing from a system that has the corresponding private key.</p>
+
+<h2>Gitweb</h2>
+
+<p>Gitweb comes with git and is fairly easy to setup. I decided to use
+Apache httpd (mostly because I&rsquo;m more familiar with it) which adds a
+few steps, but it is still relatively simple. You&rsquo;ll need to edit the
+following configuration files and restart httpd as root. I&rsquo;m presuming
+you have a fresh install of httpd, so let&rsquo;s add a virtual host. Find
+the line below in <em>/etc/httpd/conf/httpd.conf</em> and uncomment it:</p>
+
+<pre><code data-language="shell">Include conf/extra/httpd-vhosts.conf
+</code></pre>
+
+<p>Now edit <em>/etc/httpd/conf/extra/httpd-vhosts.conf</em> and add the virtual
+host at the end of the file:</p>
+
+<pre><code data-language="shell"><VirtualHost *:80>
+    ServerName    gitserver
+    ServerAlias   git.hostname.com
+    DocumentRoot  /srv/http/gitweb
+    SetEnv        GITWEB_CONFIG   /etc/conf.d/git-web.conf
+    <Directory /srv/http/gitweb>
+            Options ExecCGI FollowSymLinks
+        AddHandler cgi-script cgi
+        DirectoryIndex gitweb.cgi
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^.* /gitweb.cgi/$0 [L,PT]
+    </Directory>
+</VirtualHost>
+</code></pre>
+
+<p>If you aren&rsquo;t using an Arch Linux package of httpd, you may need to
+figure out the right place to add your virtual host, but the virtual
+host information should work as is. We are basically using the gitweb
+script as a CGI script. Since we are using <em>/srv/http/gitweb</em> as the
+base directory, we&rsquo;ll want to symlink that to gitweb&rsquo;s working
+directory:</p>
+
+<pre><code data-language="shell">ln -s /usr/share/gitweb /srv/http/gitweb
+</code></pre>
+
+<p>Next, restart httpd:</p>
+
+<pre><code data-language="shell">systemctl restart httpd.service
+</code></pre>
+
+<p>With that done, we only need to modify gitweb&rsquo;s configuration file
+<em>/etc/conf.d/git-web.conf</em>. Here is what mine looks like:</p>
+
+<pre><code data-language="perl">our $git_temp = "/tmp";
+our $site_name = "git repos";
+our $projectroot = "/srv/git/repositories";
+our $projects_list = "/srv/git/projects.list";
+
+$feature{'highlight'}{'default'} = [1];
+
+@git_base_url_list = ( "ssh://git\@git.hostname.com" );
+
+
+# We want to append the path request from the go get which we can get
+# from the REQUEST_URI
+$go_repo_path = $ENV{'REQUEST_URI'};
+$go_repo_path =~ s/\?.*//g;
+$go_prefix = $go_repo_path;
+if ($go_repo_path !~ m/\.git$/ && $go_repo_path !~ m/\/$/) { $go_repo_path .= ".git"; }
+our $site_html_head_string = "";
+</code></pre>
+
+<p>The first half of the file is fairly common gitweb configuring. Note
+that we set the <em>$projects_list</em> to be the <em>projects.list</em> file that
+Gitolite is generating. The magic for Go happens in the last half of
+the file. Go can pull from external version control systems (VCS), but
+the format seemed bulky to me. Originally, I had to use an import
+similar to:</p>
+
+<pre><code data-language="go">import "git.hostname.com/git/testing.git/package"
+</code></pre>
+
+<p>The addition of the meta tag to Gitweb&rsquo;s pages made it possible to
+import with something much more readable and more akin to importing
+from a public repository like GitHub.</p>
+
+<pre><code data-language="go">import "git.hostname.com/testing/package"
+</code></pre>
+
+<p>The Perl code essentially uses some regular expressions to generate a
+meta tag that Go&rsquo;s remote pulling feature will recognize. In order for
+it to work seamlessly Go needs the meta tag to include the exact path
+being imported to map to an exact repository. We can get that
+information from the <em>REQUEST_URI</em> that Go sends Gitweb. So, in my
+example import above, the meta tag would end up looking something
+like:</p>
+
+<pre><code data-language="html"><meta name="go-import" content="git.hostname.com/testing git ssh://git\@git.hostname.com/testing.git\"></meta>
+</code></pre>
+
+<h2>It Works!</h2>
+
+<p>With that done, Gitweb is now setup to work well with Go&rsquo;s remote import feature. I can run something like</p>
+
+<pre><code data-language="go">go get git.hostname.com/config
+</code></pre>
+
+<p>to get the package, or simply import that in other code and Go will
+fetch it for me.</p>
+
+<p>All of this came together after a lot of searching on the
+internet. Here are some links I used to get this all working:</p>
+
+<ul>
+<li><a href="http://golang.org/cmd/go/#hdr-Remote_import_path_syntax">Go&rsquo;s get/remote documentation</a></li>
+<li><a href="http://sitaramc.github.com/gitolite/master-toc.html">Gitolite&rsquo;s Manual</a></li>
+<li><a href="http://www.kernel.org/pub/software/scm/git/docs/gitweb.conf.html">Gitweb&rsquo;s gitweb.conf manual page</a></li>
+</ul>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#git">git</a></li>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+
+<p><a href="archives.html">More...</a></p>
+
+
+			<footer>
+				<p>
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						<img alt="Creative Commons License" 
+								 style="border-width:0" 
+								 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+					</a>
+					<br />
+					This work is licensed under a 
+					<a rel="license" 
+						 href="http://creativecommons.org/licenses/by/3.0/us/">
+						Creative Commons Attribution 3.0 United States License
+					</a>.
+				</p>
+				<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+			</footer>
+		</div>
+
+		<!-- These are the scripts for syntax highlighting. -->
+		<script src="rainbow/js/rainbow.min.js"></script>
+		<script src="rainbow/js/language/generic.js"></script>
+		
+		<script src="rainbow/js/language/shell.js"></script>
+		
+		<script src="rainbow/js/language/go.js"></script>
+		
+		<script src="rainbow/js/language/html.js"></script>
+		
+		<script src="rainbow/js/language/perl.js"></script>
+		
+
+		<!-- Twitter Bootstrap. -->
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>
