@@ -1,7 +1,7 @@
 <!-- Title: Private Git Repos And Go -->
 <!-- Author: Joshua Marsh -->
 <!-- Tags: git,go -->
-<!-- Languages: shell,go,html,perl -->
+<!-- Languages: shell,go,html,php -->
 
 I spent a little bit of time this weekend tinkering on a small project
 I've been thinking about for quite a while. Google's new(ish) language
@@ -188,7 +188,7 @@ Next, restart httpd:
 With that done, we only need to modify gitweb's configuration file
 */etc/conf.d/git-web.conf*. Here is what mine looks like:
 
-<pre><code data-language="perl">our $git_temp = "/tmp";
+<pre><code data-language="php">our $git_temp = "/tmp";
 our $site_name = "git repos";
 our $projectroot = "/srv/git/repositories";
 our $projects_list = "/srv/git/projects.list";

@@ -6,23 +6,55 @@
 		
 		
 
+		<link rel="shortcut icon" href="favicon.ico" />
+
 		<!-- jQuery for bootstrap. -->
-		<script src="jquery/js/jquery.min.js"></script>
+		<script 
+			 src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js">
+		</script>
+
+		<!-- Center ads on ready. -->
+		<script type="text/javascript">
+			$(document).ready(function() {
+			if (window.innerWidth > 800) {
+			$(".centerad").css({"width": "728px"});
+			} else {
+			$(".centerad").css({"width": "320px"});
+			}
+			});
+		</script>
 
 		<!-- These are the style sheets for syntax highlighting. -->
 		<link type="text/css" rel="stylesheet" 
 					href="rainbow/css/github.css"/>
 
 		<!-- Twitter Bootstrap. -->
-		<link type="text/css" rel="stylesheet" 
-					href="bootstrap/css/bootstrap.min.css"/>
-		<link type="text/css" rel="stylesheet" 
-					href="bootstrap/css/bootstrap-responsive.css"/>
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
 
 		<!-- Our own CSS. -->
-		<link type="text/css" rel="stylesheet" 
-					href="css/blog.css"/>		
-	</head>
+		<style>
+			body {
+			/* 60px to make the container go all the way to the bottom of the
+			topbar */
+			padding-top: 60px; 
+			}
+
+			footer {
+			text-align: center;
+			font-size: small;
+			}
+
+			.float-right {
+			float: right;
+			padding: 5px;
+			}
+
+			.centerad {
+			margin-left: auto;
+			margin-right: auto;
+			}
+		</style
+			 </head>
 	<body>
 		<div class="container">
 
@@ -263,7 +295,7 @@ it just the same.</p>
 
 <!-- Tags: vim,go -->
 
-<!-- Languages: shell,go,html,perl -->
+<!-- Languages: shell,go,html -->
 
 <p>I grew up on <a href="http://www.gnu.org/software/emacs/">Emacs</a> and
 <a href="http://www.gnu.org/software/bash/">Bash</a>. I love them dearly (I have
@@ -386,7 +418,7 @@ any feedback.</p>
 
 <!-- Tags: git,go -->
 
-<!-- Languages: shell,go,html,perl -->
+<!-- Languages: shell,go,html,php -->
 
 <p>I spent a little bit of time this weekend tinkering on a small project
 I&rsquo;ve been thinking about for quite a while. Google&rsquo;s new(ish) language
@@ -570,7 +602,7 @@ directory:</p>
 <p>With that done, we only need to modify gitweb&rsquo;s configuration file
 <em>/etc/conf.d/git-web.conf</em>. Here is what mine looks like:</p>
 
-<pre><code data-language="perl">our $git_temp = "/tmp";
+<pre><code data-language="php">our $git_temp = "/tmp";
 our $site_name = "git repos";
 our $projectroot = "/srv/git/repositories";
 our $projects_list = "/srv/git/projects.list";
@@ -656,39 +688,76 @@ internet. Here are some links I used to get this all working:</p>
 <p><a href="archives.html">More...</a></p>
 
 
-			<footer>
-				<p>
-					<a rel="license" 
-						 href="http://creativecommons.org/licenses/by/3.0/us/">
-						<img alt="Creative Commons License" 
-								 style="border-width:0" 
-								 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
-					</a>
-					<br />
-					This work is licensed under a 
-					<a rel="license" 
-						 href="http://creativecommons.org/licenses/by/3.0/us/">
-						Creative Commons Attribution 3.0 United States License
-					</a>.
-				</p>
-				<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
-			</footer>
-		</div>
+			<div class="centerad">
+				<script type="text/javascript">
+					if (window.innerWidth > 800) {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (normal) */
+		google_ad_slot = "4997781473";
+		google_ad_width = 728;
+		google_ad_height = 90;
+		} else {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (mobile) */
+		google_ad_slot = "7951247872";
+		google_ad_width = 320;
+		google_ad_height = 50;
+		}
+</script>
+<script type="text/javascript"
+				src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+<footer>
+	<p>
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			<img alt="Creative Commons License" 
+					 style="border-width:0" 
+					 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+		</a>
+		<br />
+		This work is licensed under a 
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			Creative Commons Attribution 3.0 United States License
+		</a>.
+	</p>
+	<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+</footer>
+</div>
 
-		<!-- These are the scripts for syntax highlighting. -->
-		<script src="rainbow/js/rainbow.min.js"></script>
-		<script src="rainbow/js/language/generic.js"></script>
-		
-		<script src="rainbow/js/language/shell.js"></script>
-		
-		<script src="rainbow/js/language/go.js"></script>
-		
-		<script src="rainbow/js/language/html.js"></script>
-		
-		<script src="rainbow/js/language/perl.js"></script>
-		
+<!-- These are the scripts for syntax highlighting. -->
+<script 
+	 src="//cdnjs.cloudflare.com/ajax/libs/rainbow/1.1.8/js/rainbow.min.js ">
+</script>
+<script src="rainbow/js/language/generic.js"></script>
 
-		<!-- Twitter Bootstrap. -->
-		<script src="bootstrap/js/bootstrap.min.js"></script>
-	</body>
+<script src="rainbow/js/language/shell.js"></script>
+
+<script src="rainbow/js/language/go.js"></script>
+
+<script src="rainbow/js/language/html.js"></script>
+
+<script src="rainbow/js/language/php.js"></script>
+
+
+<!-- Twitter Bootstrap. -->
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+
+<!-- Google Analytics. -->
+<script type="text/javascript">
+
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-37698200-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+
+</script>
+</body>
 </html>

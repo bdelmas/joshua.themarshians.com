@@ -1,7 +1,7 @@
 <!-- Title: Vim and Go -->
 <!-- Author: Joshua Marsh -->
 <!-- Tags: vim,go -->
-<!-- Languages: shell,go,html,perl -->
+<!-- Languages: shell,go,html -->
 
 I grew up on [Emacs](http://www.gnu.org/software/emacs/) and
 [Bash](http://www.gnu.org/software/bash/). I love them dearly (I have
