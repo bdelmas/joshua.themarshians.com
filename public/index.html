@@ -107,6 +107,111 @@
 <div class="row">
 	<div class="span12">
 		
+		<h1>Colds, Static Blogs, and Go</h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2013-01-29
+			</small>
+		</p>
+
+		<!-- Title: Colds, Static Blogs, and Go -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: go,blog,html -->
+
+<!-- Languages: shell -->
+
+<p>Last week in my <a href="http://plug.org/">local Linux user group</a> mailing
+list the topic of static blogging came up. I had been thinking of
+converting my blog over, but wasn&rsquo;t sure which one I&rsquo;d prefer to
+use. One of the responses to my inquiry was:</p>
+
+<blockquote>
+<p>If you&rsquo;ve been looking for a project with which to learn a new
+language, writing your own blog engine is a reasonable choice.  The
+&lsquo;market&rsquo; is already hopelessly polluted with toy blog engines, which
+is evidence for its suitability as a learning project.  Most of what
+makes a blog memorable has absolutely nothing to do with the
+back-end software, anyway.  If you are feeling ambitious, you could
+write a blog engine <em>and</em> your own Markdown parser with custom
+extensions
+(<a href="http://plug.org/pipermail/plug/2013-January/029154.html">Pearson, 2013</a>).</p>
+</blockquote>
+
+<p>I don&rsquo;t normally find myself with much time on my hands. I have two
+young children, school, a full-time job, and now a sister-in-law with
+crutches in the home. Misfortune (or fortune I suppose) befell me this
+weekend though and my son gave me a terrible cold. I was out of
+commission for the entire weekend.</p>
+
+<p>You can only watch so much
+<a href="http://www.usanetwork.com/series/psych/">Psych</a> and
+<a href="http://www.pbs.org/wgbh/masterpiece/downtonabbey/">Downton Abbey</a>, so
+I took upon myself the challenge of writing my own static blog
+application as suggested. Without further guilding the lilies, here
+it is: <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+
+<p>I&rsquo;m so daring, that I&rsquo;ve even used it already to convert my existing
+blog at blogger into a static blog and I&rsquo;ve hosted it using
+appengine. If you are reading this, I can say that the software
+worked! What&rsquo;s nice about this all is that it&rsquo;s still
+free. <a href="https://github.com">Github</a> can host the code and I don&rsquo;t
+imagine myself exceeding the free limits of
+<a href="https://developers.google.com/appengine/">appengine</a>.</p>
+
+<p>It is certainly rough around the edges, but I was surprised what I
+could accomplish over a weekend while heavily medicated. I attribute a
+lot of the success to the tools already available to me. Go provides a
+<a href="http://golang.org/pkg/text/template/">template package</a> and
+<a href="https://github.com/russross/blackfriday">Russ Ross</a> already had a
+<a href="http://daringfireball.net/projects/markdown/">markdown</a> parser. The
+front-end is simply <a href="http://twitter.github.com/bootstrap/">bootstrap</a>,
+<a href="http://jquery.com/">jquery</a>, and
+<a href="http://craig.is/making/rainbows">rainbow</a>. It was merely a matter
+putting the pieces together.</p>
+
+<p>You can see a completed working example with my own
+<a href="http://joshua.themarshians.com/">blog</a> which originates from a
+<a href="https://github.com/icub3d/joshua.themarshians.com">project on github</a>. It
+works great for me, but I&rsquo;d be happy to entertain requests for
+changes. I tried to keep it simple, so it expects you to design the
+templates yourself but I imagine most DIY bloggers would want that
+anyway. All I do now to publish is:</p>
+
+<pre><code data-language="shell">$ goblog
+$ appcfg.py update joshua.themarshians.com
+</code></pre>
+
+<p>Overall, it was a fun weekend for me and not just because of the
+codeine. I can&rsquo;t say that I was a novice at Go, but I did learn a lot
+and hope to use the project as a springboard for more learning. I
+still need to add unit tests, improve the documentation, etc. All of
+those are sure to increase my knowledge of Go.</p>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+				<li><a href="tags.html#blog">blog</a></li>
+				
+				<li><a href="tags.html#html">html</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+<div class="row">
+	<div class="span12">
+		
 		<h1>Go App, Do You Read Me?</h1>
 		
 
@@ -285,7 +390,7 @@ it just the same.</p>
 
 		<p>
 			<small id="entry-date">
-				2013-01-09
+				2013-01-09 (Updated: 2013-01-28)
 			</small>
 		</p>
 
@@ -400,290 +505,6 @@ any feedback.</p>
 </div>
 <hr>
 
-<div class="row">
-	<div class="span12">
-		
-		<h1>Private Git Repos And Go</h1>
-		
-
-		<p>
-			<small id="entry-date">
-				2012-12-23
-			</small>
-		</p>
-
-		<!-- Title: Private Git Repos And Go -->
-
-<!-- Author: Joshua Marsh -->
-
-<!-- Tags: git,go -->
-
-<!-- Languages: shell,go,html,php -->
-
-<p>I spent a little bit of time this weekend tinkering on a small project
-I&rsquo;ve been thinking about for quite a while. Google&rsquo;s new(ish) language
-Go seemed like a good candidate for the project. One of the great
-features of <a href="http://golang.org/">Go</a> is that your can import external
-code sources relatively easily. I have a small private repository at
-home and I wanted to simplify the process of importing the code and
-maintaining the repositories. In the end, I chose
-<a href="https://github.com/sitaramc/gitolite">Gitolite</a> +
-<a href="https://git.wiki.kernel.org/index.php/Gitweb">Gitweb</a> on an
-<a href="https://www.archlinux.org/">Arch</a> Linux system. Here is how I did it.</p>
-
-<h2>Preparations</h2>
-
-<p>Since we are using git, you&rsquo;ll want to make sure you have that
-installed. We will also be using
-<a href="http://httpd.apache.org/">Apache httpd</a> for gitweb and to facilitate
-go&rsquo;s remote import mechanism. On an Arch Linux system, you can do that
-in a terminal with:</p>
-
-<pre><code data-language="shell">pacman -S git apache  
-</code></pre>
-
-<p>The git package will create a git user that we will use during this
-process. The user needs a little help though. As root:</p>
-
-<pre><code data-language="shell">usermod -d /srv/git git
-passwd -d git
-</code></pre>
-
-<p>We are simply telling the system that the users home directory should
-be <em>/srv/git</em> and it should not have a password (i.e. can&rsquo;t log
-in). Make the home directory and give it the proper permissions:</p>
-
-<pre><code data-language="shell">mkdir /srv/git
-chown git.git /srv/git
-chmod 750 /srv/git
-</code></pre>
-
-<p>We also want the http user to be in the git group so that gitweb can
-read files from <em>/srv/git</em> and then restart httpd. You can do this by
-running the following commands:</p>
-
-<pre><code data-language="shell">usermod -a -G git http
-systemctl restart httpd.service
-</code></pre>
-
-<p>From this point on, I&rsquo;ll presume you are using the git user and are in
-his <em>$HOME</em> directory unless otherwise specified.</p>
-
-<h2>Gitolite</h2>
-
-<p>Gitolite is a great git repository management tool that is used by
-quite a few high profile project (e.g. the
-<a href="http://git.kernel.org/">Linux kernel</a>). The big advantages it has
-over using the standard git tools like
-<a href="http://www.kernel.org/pub/software/scm/git/docs/git-daemon.html">git-daemon</a>
-or
-<a href="http://www.kernel.org/pub/software/scm/git/docs/git-http-backend.html">git-http-backend</a>
-is that it is extremely simple to use and you can manage it remotely
-once it is setup.</p>
-
-<p>I simply pull the latest from <a href="https://github.com/">GitHub</a> and do the
-install:</p>
-
-<pre><code data-language="shell">git clone git://github.com/sitaramc/gitolite
-mkdir $HOME/bin
-gitolite/install -ln
-</code></pre>
-
-<p>Gitolite uses SSH for authentication via public keys. As such, you&rsquo;ll
-want to have your public key somewhere on the system. I copied mine to
-<em>/tmp/username.pub</em>. Make sure your file&rsquo;s base name is the name of the
-user you plan to log in with when accessing the repositories. Then run
-the setup:</p>
-
-<pre><code data-language="shell">bin/gitolite setup /tmp/username.pub
-</code></pre>
-
-<p>I made a few changes in <em>$HOME/.gitolite.rc</em> to facilitate httpd being
-able to access the repositories. Modify the <em>UMASK</em> and
-<em>GIT_CONFIG_KEYS</em> to:</p>
-
-<pre><code data-language="shell">UMASK           => 0027,
-GIT_CONFIG_KEYS => 'gitweb\.(owner|description|category)*',
-</code></pre>
-
-<p>This will give the git group the ability to read the repositories and allow the gitolite configuration file to store some basic gitweb configuration options. Finally, make sure that the repositories path is accessible by the git group:</p>
-
-<pre><code data-language="shell">chmod g+rx repositories
-</code></pre>
-
-<p>Gitolite is ready to use! You configure it and setup repositories by cloning the gitolite-admin repository:</p>
-
-<pre><code data-language="shell">git clone git@git.hostname.com:gitolite-admin
-</code></pre>
-
-<p>Here is my <em>conf/gitolite.conf</em> file:</p>
-
-<pre><code data-language="shell">@webs = config testing
-
-repo gitolite-admin
-    RW+     =   jmarsh
-
-repo config
-    RW+     =   jmarsh
-  config gitweb.owner = joshua@themarshians.com
-  config gitweb.description = A recursive JSON config parser.
-
-repo testing
-    RW+     =   @all
-  config gitweb.owner = joshua@themarshians.com
-  config gitweb.description = A test playground for connection and gitolite.
-
-repo @webs
-  R       =   gitweb
-</code></pre>
-
-<p>I setup the <em>@webs</em> group to allow gitolite to manage the projects
-list. The user <em>gitweb</em> is a special user for gitolite. Any repository
-that givea that user read (R) permissions will be added to the file
-<em>$HOME/projects.list</em>. Gitweb can then use this file to display the
-repositories you want visible. Any repositories that you want gitweb
-to display simply need to be added to the <em>@webs</em> group. You can see
-Gitolite&rsquo;s documentation for more information on what the rest of the
-configurations mean.</p>
-
-<p>Once you are satisfied with your configurations, commit the changes
-and push it back to the server. Gitolite will do the rest, including
-creating new repositories as necessary. Remember, gitolite will use
-the SSH public key you gave it for authentication, so make sure you
-are pushing from a system that has the corresponding private key.</p>
-
-<h2>Gitweb</h2>
-
-<p>Gitweb comes with git and is fairly easy to setup. I decided to use
-Apache httpd (mostly because I&rsquo;m more familiar with it) which adds a
-few steps, but it is still relatively simple. You&rsquo;ll need to edit the
-following configuration files and restart httpd as root. I&rsquo;m presuming
-you have a fresh install of httpd, so let&rsquo;s add a virtual host. Find
-the line below in <em>/etc/httpd/conf/httpd.conf</em> and uncomment it:</p>
-
-<pre><code data-language="shell">Include conf/extra/httpd-vhosts.conf
-</code></pre>
-
-<p>Now edit <em>/etc/httpd/conf/extra/httpd-vhosts.conf</em> and add the virtual
-host at the end of the file:</p>
-
-<pre><code data-language="shell"><VirtualHost *:80>
-    ServerName    gitserver
-    ServerAlias   git.hostname.com
-    DocumentRoot  /srv/http/gitweb
-    SetEnv        GITWEB_CONFIG   /etc/conf.d/git-web.conf
-    <Directory /srv/http/gitweb>
-            Options ExecCGI FollowSymLinks
-        AddHandler cgi-script cgi
-        DirectoryIndex gitweb.cgi
-        RewriteEngine On
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^.* /gitweb.cgi/$0 [L,PT]
-    </Directory>
-</VirtualHost>
-</code></pre>
-
-<p>If you aren&rsquo;t using an Arch Linux package of httpd, you may need to
-figure out the right place to add your virtual host, but the virtual
-host information should work as is. We are basically using the gitweb
-script as a CGI script. Since we are using <em>/srv/http/gitweb</em> as the
-base directory, we&rsquo;ll want to symlink that to gitweb&rsquo;s working
-directory:</p>
-
-<pre><code data-language="shell">ln -s /usr/share/gitweb /srv/http/gitweb
-</code></pre>
-
-<p>Next, restart httpd:</p>
-
-<pre><code data-language="shell">systemctl restart httpd.service
-</code></pre>
-
-<p>With that done, we only need to modify gitweb&rsquo;s configuration file
-<em>/etc/conf.d/git-web.conf</em>. Here is what mine looks like:</p>
-
-<pre><code data-language="php">our $git_temp = "/tmp";
-our $site_name = "git repos";
-our $projectroot = "/srv/git/repositories";
-our $projects_list = "/srv/git/projects.list";
-
-$feature{'highlight'}{'default'} = [1];
-
-@git_base_url_list = ( "ssh://git\@git.hostname.com" );
-
-
-# We want to append the path request from the go get which we can get
-# from the REQUEST_URI
-$go_repo_path = $ENV{'REQUEST_URI'};
-$go_repo_path =~ s/\?.*//g;
-$go_prefix = $go_repo_path;
-if ($go_repo_path !~ m/\.git$/ && $go_repo_path !~ m/\/$/) { $go_repo_path .= ".git"; }
-our $site_html_head_string = "";
-</code></pre>
-
-<p>The first half of the file is fairly common gitweb configuring. Note
-that we set the <em>$projects_list</em> to be the <em>projects.list</em> file that
-Gitolite is generating. The magic for Go happens in the last half of
-the file. Go can pull from external version control systems (VCS), but
-the format seemed bulky to me. Originally, I had to use an import
-similar to:</p>
-
-<pre><code data-language="go">import "git.hostname.com/git/testing.git/package"
-</code></pre>
-
-<p>The addition of the meta tag to Gitweb&rsquo;s pages made it possible to
-import with something much more readable and more akin to importing
-from a public repository like GitHub.</p>
-
-<pre><code data-language="go">import "git.hostname.com/testing/package"
-</code></pre>
-
-<p>The Perl code essentially uses some regular expressions to generate a
-meta tag that Go&rsquo;s remote pulling feature will recognize. In order for
-it to work seamlessly Go needs the meta tag to include the exact path
-being imported to map to an exact repository. We can get that
-information from the <em>REQUEST_URI</em> that Go sends Gitweb. So, in my
-example import above, the meta tag would end up looking something
-like:</p>
-
-<pre><code data-language="html"><meta name="go-import" content="git.hostname.com/testing git ssh://git\@git.hostname.com/testing.git\"></meta>
-</code></pre>
-
-<h2>It Works!</h2>
-
-<p>With that done, Gitweb is now setup to work well with Go&rsquo;s remote import feature. I can run something like</p>
-
-<pre><code data-language="go">go get git.hostname.com/config
-</code></pre>
-
-<p>to get the package, or simply import that in other code and Go will
-fetch it for me.</p>
-
-<p>All of this came together after a lot of searching on the
-internet. Here are some links I used to get this all working:</p>
-
-<ul>
-<li><a href="http://golang.org/cmd/go/#hdr-Remote_import_path_syntax">Go&rsquo;s get/remote documentation</a></li>
-<li><a href="http://sitaramc.github.com/gitolite/master-toc.html">Gitolite&rsquo;s Manual</a></li>
-<li><a href="http://www.kernel.org/pub/software/scm/git/docs/gitweb.conf.html">Gitweb&rsquo;s gitweb.conf manual page</a></li>
-</ul>
-
-
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#git">git</a></li>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
-
 
 <p><a href="archives.html">More...</a></p>
 
@@ -738,8 +559,6 @@ internet. Here are some links I used to get this all working:</p>
 <script src="rainbow/js/language/go.js"></script>
 
 <script src="rainbow/js/language/html.js"></script>
-
-<script src="rainbow/js/language/php.js"></script>
 
 
 <!-- Twitter Bootstrap. -->

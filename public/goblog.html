@@ -2,8 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Archives</title>
+		<title>Colds, Static Blogs, and Go</title>
 		
+		
+		<meta name="author" content="Joshua Marsh">
 		
 
 		<link rel="shortcut icon" href="favicon.ico" />
@@ -85,7 +87,7 @@
 										Tags
 									</a>
 								</li>
-								<li class="active">
+								<li >
 									<a href="archives.html">
 										<i class="icon-hdd icon-white"></i>
 										Archives
@@ -103,75 +105,104 @@
 				</div>
 			</div>
 
-			      <h1>Site Archive</h1>
-      <p class="date">
-				Last updated: 2013-01-29
+			
+      <h1>Colds, Static Blogs, and Go</h1>
+
+
+      <p>
+				<small id="entry-date">
+					2013-01-29
+				</small>
 			</p>
 
+<!-- Title: Colds, Static Blogs, and Go -->
 
-			<h2>2013</h2>
+<!-- Author: Joshua Marsh -->
 
-			<h3>January</h3>
-			<ul>
+<!-- Tags: go,blog,html -->
 
-        <li>2013-01-29 &mdash; <a href="goblog.html">Colds, Static Blogs, and Go</a></li>
+<!-- Languages: shell -->
 
-        <li>2013-01-17 &mdash; <a href="go-app-do-you-read-me.html">Go App, Do You Read Me?</a></li>
+<p>Last week in my <a href="http://plug.org/">local Linux user group</a> mailing
+list the topic of static blogging came up. I had been thinking of
+converting my blog over, but wasn&rsquo;t sure which one I&rsquo;d prefer to
+use. One of the responses to my inquiry was:</p>
 
-        <li>2013-01-09 &mdash; <a href="vim-and-go.html">Vim and Go</a></li>
+<blockquote>
+<p>If you&rsquo;ve been looking for a project with which to learn a new
+language, writing your own blog engine is a reasonable choice.  The
+&lsquo;market&rsquo; is already hopelessly polluted with toy blog engines, which
+is evidence for its suitability as a learning project.  Most of what
+makes a blog memorable has absolutely nothing to do with the
+back-end software, anyway.  If you are feeling ambitious, you could
+write a blog engine <em>and</em> your own Markdown parser with custom
+extensions
+(<a href="http://plug.org/pipermail/plug/2013-January/029154.html">Pearson, 2013</a>).</p>
+</blockquote>
 
-					</ul>
+<p>I don&rsquo;t normally find myself with much time on my hands. I have two
+young children, school, a full-time job, and now a sister-in-law with
+crutches in the home. Misfortune (or fortune I suppose) befell me this
+weekend though and my son gave me a terrible cold. I was out of
+commission for the entire weekend.</p>
+
+<p>You can only watch so much
+<a href="http://www.usanetwork.com/series/psych/">Psych</a> and
+<a href="http://www.pbs.org/wgbh/masterpiece/downtonabbey/">Downton Abbey</a>, so
+I took upon myself the challenge of writing my own static blog
+application as suggested. Without further guilding the lilies, here
+it is: <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+
+<p>I&rsquo;m so daring, that I&rsquo;ve even used it already to convert my existing
+blog at blogger into a static blog and I&rsquo;ve hosted it using
+appengine. If you are reading this, I can say that the software
+worked! What&rsquo;s nice about this all is that it&rsquo;s still
+free. <a href="https://github.com">Github</a> can host the code and I don&rsquo;t
+imagine myself exceeding the free limits of
+<a href="https://developers.google.com/appengine/">appengine</a>.</p>
+
+<p>It is certainly rough around the edges, but I was surprised what I
+could accomplish over a weekend while heavily medicated. I attribute a
+lot of the success to the tools already available to me. Go provides a
+<a href="http://golang.org/pkg/text/template/">template package</a> and
+<a href="https://github.com/russross/blackfriday">Russ Ross</a> already had a
+<a href="http://daringfireball.net/projects/markdown/">markdown</a> parser. The
+front-end is simply <a href="http://twitter.github.com/bootstrap/">bootstrap</a>,
+<a href="http://jquery.com/">jquery</a>, and
+<a href="http://craig.is/making/rainbows">rainbow</a>. It was merely a matter
+putting the pieces together.</p>
+
+<p>You can see a completed working example with my own
+<a href="http://joshua.themarshians.com/">blog</a> which originates from a
+<a href="https://github.com/icub3d/joshua.themarshians.com">project on github</a>. It
+works great for me, but I&rsquo;d be happy to entertain requests for
+changes. I tried to keep it simple, so it expects you to design the
+templates yourself but I imagine most DIY bloggers would want that
+anyway. All I do now to publish is:</p>
+
+<pre><code data-language="shell">$ goblog
+$ appcfg.py update joshua.themarshians.com
+</code></pre>
+
+<p>Overall, it was a fun weekend for me and not just because of the
+codeine. I can&rsquo;t say that I was a novice at Go, but I did learn a lot
+and hope to use the project as a springboard for more learning. I
+still need to add unit tests, improve the documentation, etc. All of
+those are sure to increase my knowledge of Go.</p>
 
 
-			<h2>2012</h2>
 
-			<h3>December</h3>
-			<ul>
+      <div class="tags">
+				<ul>
 
-        <li>2012-12-23 &mdash; <a href="private-git-repos-and-go.html">Private Git Repos And Go</a></li>
+          <li><a href="tags.html#go">go</a></li>
 
-					</ul>
+          <li><a href="tags.html#blog">blog</a></li>
 
-			<h3>October</h3>
-			<ul>
+          <li><a href="tags.html#html">html</a></li>
 
-        <li>2012-10-23 &mdash; <a href="america-is-falling-for-it.html">America Is Falling For It</a></li>
-
-					</ul>
-
-			<h3>August</h3>
-			<ul>
-
-        <li>2012-08-12 &mdash; <a href="every-american-should-see-wicked.html">Every American Should See Wicked</a></li>
-
-        <li>2012-08-03 &mdash; <a href="determining-determinism.html">Determining Determinism</a></li>
-
-					</ul>
-
-			<h3>July</h3>
-			<ul>
-
-        <li>2012-07-15 &mdash; <a href="uphill-both-ways.html">Uphill Both Ways</a></li>
-
-        <li>2012-07-12 &mdash; <a href="shave-and-haircut-two-bits.html">Shave and a Haircut, Two Bits?!?</a></li>
-
-					</ul>
-
-			<h3>June</h3>
-			<ul>
-
-        <li>2012-06-27 &mdash; <a href="honing-your-inner-command-line.html">Honing Your Inner Command Line</a></li>
-
-        <li>2012-06-23 &mdash; <a href="go-forth-and-read.html">Go Forth and Read</a></li>
-
-        <li>2012-06-19 &mdash; <a href="go-on-an-adventure.html">Go, Go, Go, Go On An Adventure</a></li>
-
-        <li>2012-06-17 &mdash; <a href="look-my-im-melding.html">Look Ma! I'm Melding!</a></li>
-
-        <li>2012-06-16 &mdash; <a href="chinese-chars-in-chromium.html">Chinese Character Rendering In Chromium</a></li>
-
-					</ul>
-
+				</ul>
+      </div>
 
 
 
@@ -219,6 +250,8 @@
 	 src="//cdnjs.cloudflare.com/ajax/libs/rainbow/1.1.8/js/rainbow.min.js ">
 </script>
 <script src="rainbow/js/language/generic.js"></script>
+
+<script src="rainbow/js/language/shell.js"></script>
 
 
 <!-- Twitter Bootstrap. -->
