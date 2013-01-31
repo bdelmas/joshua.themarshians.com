@@ -107,6 +107,151 @@
 <div class="row">
 	<div class="span12">
 		
+		<h1><a href="go-cross-compilers-linux.html">Cross Compiling Go Applications</a></h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2013-01-31
+			</small>
+		</p>
+
+		<!-- Title: Cross Compiling Go Applications -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: go,arch -->
+
+<!-- Languages: go,shell -->
+
+<p>In a recent discussion on
+<a href="https://plus.google.com/communities/114112804251407510571">Go&rsquo;s Google Plus Community</a>,
+some questions came up about cross compiling. In a default
+installation of <a href="http://golang.org/">Go</a>, cross compiling is not
+enabled. It only builds to toolchains for your current operating
+system and architecture. Since all of my computers are <em>amd64</em>, but
+some of the applications I build need to run on <em>i386</em>, I thought I&rsquo;d
+share how I go about doing it.</p>
+
+<p>I use <a href="https://www.archlinux.org/">Arch</a> linux, so I have provided a
+package in
+<a href="https://aur.archlinux.org/packages/go-cross-compilers-linux/">AUR</a>
+for doing this. It makes setup extremely simply. You can install the
+package by doing the following:</p>
+
+<pre><code data-language="shell">$ wget https://aur.archlinux.org/packages/go/go-cross-compilers-linux/PKGBUILD
+$ makepkg
+
+$ # For amd64
+$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-x86_64.pkg.tar.xz
+
+$ # For i386
+$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-i686.pkg.tar.xz
+</code></pre>
+
+<p>Now that the other toolchain is in place, we can make a sample program
+to test it out:</p>
+
+<pre><code data-language="go">package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    fmt.Println("Hello world!")
+}
+</code></pre>
+
+<p>If you were building it for your own architecture, something as simple
+as the following would work:</p>
+
+<pre><code data-language="shell">$ go build main.go
+$ ./main
+Hello world!
+</code></pre>
+
+<p>Building for the other architecture isn&rsquo;t much more difficult. Go will
+cross compile other operating systems and architectures based on the
+environmental variables <em>GOOS</em> and <em>GOOARCH</em>. In our case, we are
+interested in changing <em>GOARCH</em>:</p>
+
+<pre><code data-language="shell">$ GOARCH=386 go build main.go
+</code></pre>
+
+<p>Now you can copy main over your <em>i386</em> machine and run it! If you were
+cross compiling to <em>amd64</em>, you&rsquo;d simply replace <em>386</em> with <em>amd64</em>.</p>
+
+<p>One last interesting tidbit is that if you have a version of
+<a href="http://gcc.gnu.org/">gcc</a> that will cross compile, then Go
+applications that link to C libraries can also be used (despite what
+many people have suggested). In Arch, you can install a cross
+compiling version of <em>gcc</em> like this:</p>
+
+<pre><code data-language="shell">$ sudo pacman -S gcc-multilib
+</code></pre>
+
+<p>In this example, I&rsquo;m going to test a <a href="http://www.sqlite.org/">sqlite3</a>
+library, so let&rsquo;s install the 32-bit libraries:</p>
+
+<pre><code data-language="shell">$ sudo pacman -S lib32-sqlite
+</code></pre>
+
+<p>Now, we let&rsquo;s build a small app with the example from
+<a href="https://github.com/mattn/go-sqlite3">go-sqlite3</a>:</p>
+
+<pre><code data-language="shell">$ go get github.com/mattn/go-sqlite3
+$ mkdir testsql
+$ cd testsql
+$ wget https://raw.github.com/mattn/go-sqlite3/master/example/main.go
+
+$ # Test the program locally to make sure it works.
+$ go run main.go
+
+$ # Build for i386
+GOARCH=386 go build
+
+$ # Verify it's linked against the right libraries (lib32).
+$ ldd testsql
+    linux-gate.so.1 (0xf77ba000)
+    libsqlite3.so.0 => /usr/lib32/libsqlite3.so.0 (0xf76e2000)
+    libpthread.so.0 => /usr/lib32/libpthread.so.0 (0xf76c7000)
+    libc.so.6 => /usr/lib32/libc.so.6 (0xf7516000)
+    libdl.so.2 => /usr/lib32/libdl.so.2 (0xf7511000)
+    /lib/ld-linux.so.2 (0xf77bb000)
+
+$ # Test is on i386.
+scp testsql jmarsh@i386-box:
+ssh jmarsh@i386-box
+./testsql﻿
+</code></pre>
+
+<p>Obviously this could all be alleviated by using virtual machines, but
+the ability of the go toolchain to do this on a single system is
+really powerful. I can&rsquo;t begin to express how useful this is on many
+of the projects I&rsquo;ve worked on. I&rsquo;m always looking to improve, so if
+you can see ways to improve my PKGBUILD file or if you&rsquo;ve found a
+simpler way to do something, let me know.</p>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+				<li><a href="tags.html#arch">arch</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+<div class="row">
+	<div class="span12">
+		
 		<h1><a href="goblog.html">Colds, Static Blogs, and Go</a></h1>
 		
 
@@ -382,129 +527,6 @@ it just the same.</p>
 </div>
 <hr>
 
-<div class="row">
-	<div class="span12">
-		
-		<h1><a href="vim-and-go.html">Vim and Go</a></h1>
-		
-
-		<p>
-			<small id="entry-date">
-				2013-01-09 (Updated: 2013-01-28)
-			</small>
-		</p>
-
-		<!-- Title: Vim and Go -->
-
-<!-- Author: Joshua Marsh -->
-
-<!-- Tags: vim,go -->
-
-<!-- Languages: shell,go,html -->
-
-<p>I grew up on <a href="http://www.gnu.org/software/emacs/">Emacs</a> and
-<a href="http://www.gnu.org/software/bash/">Bash</a>. I love them dearly (I have
-the pinky fingers to prove it). I&rsquo;m not so blinded by my faith in them
-though that I won&rsquo;t occasionally try new things. I&rsquo;ve heard a lot of
-good things about <a href="http://www.zsh.org/">Zsh</a> and I&rsquo;ve found myself
-connecting to many a servers that have <a href="http://www.vim.org/">Vim</a>
-installed but not Emacs. So, I thought I&rsquo;d give them a try.</p>
-
-<p>Of course, my new pet programming language is
-<a href="http://golang.org/">Go</a>, so I thought I&rsquo;d try and get some basic
-functionality for Go working with Vim. I&rsquo;m pleased to say the process
-was rather simple, but some of the documentation I found online was
-somewhat outdated (the readmes were up to date but hard to find). I
-thought I&rsquo;d share what I did, if nothing else so I can remember if I
-ever have to do it again.</p>
-
-<p>First, if you are like me and don&rsquo;t have Vim installed on your system,
-you should get that setup. On
-<a href="https://www.archlinux.org/">Arch Linux</a>, you can:</p>
-
-<pre><code data-language="shell">sudo pacman -S gvim
-</code></pre>
-
-<p>This will install the GUI version of Vim as well as the console
-version. Next, you&rsquo;ll want to update your <em>~/.vimrc</em> file to use Go&rsquo;s
-Vim tools. They come standard with the installation, you just need to
-setup Vim to use them. Append the following to your <em>~/.vimrc</em> file:</p>
-
-<pre><code data-language="shell">set rtp+=$GOROOT/misc/vim
-filetype plugin indent on
-syntax on
-</code></pre>
-
-<p>You&rsquo;ll want to replace <em>$GOROOT</em> with the path to Go&rsquo;s share items (in
-Arch Linux, it is <em>/usr/share/go</em>). This will give you fairly useful
-features like syntax highlighting proper indentation, and
-documentation.</p>
-
-<p><img src="img/vim-godoc.png" alt="vim an godoc" />
-</p>
-
-<p>I was also interested in auto-completion as I use it quite often in
-Emacs. Fortunately, <a href="https://github.com/nsf/gocode">Gocode</a> provides
-functionality for vim as well. Setting it up was simple. If you
-haven&rsquo;t used Gocode before, you&rsquo;ll need to install it&rsquo;s daemon:</p>
-
-<pre><code data-language="shell">go get -u github.com/nsf/gocode
-</code></pre>
-
-<p>If you don&rsquo;t have your <em>$GOPATH*s bin folder in your path, you&rsquo;ll need
-to add that. My *.zshrc</em> file has these lines that do just that:</p>
-
-<pre><code data-language="shell">export GOPATH="${HOME}/go"
-export GOBIN="${GOPATH}/bin"
-export PATH="${PATH}:${GOBIN}"
-</code></pre>
-
-<p>With those steps completed, run the setup script provided:</p>
-
-<pre><code data-language="shell">cd $GOPATH/src/github.com/nsf/gocode/vim
-./update.bash
-</code></pre>
-
-<p>Finally, append the following to your <em>~/.vimrc</em>:</p>
-
-<pre><code data-language="shell">filetype plugin on
-</code></pre>
-
-<p>Now, when you are typing a command and aren&rsquo;t quite sure what should
-come next or want to see what the function parameters are, simply use
-&lt;C-x&gt;&lt;C-o&gt; and Gocode will give you a list of possibly completion
-commands. If you install packages, it will even auto-complete from
-those (assuming they are in your <em>$GOPATH/pkg</em> directory).</p>
-
-<p><img src="img/gocode.png" alt="gocode" />
-</p>
-
-<p>So far, I have been impressed with how Vim and Go interact. It was
-fairly simple to setup considering I haven&rsquo;t ever used Vim except for
-the most basic viewing and editing. I&rsquo;m not ready to leave Emacs just
-yet, but Vim and Go have certainly been fun and I&rsquo;ll keep at it for a
-while to see how close I can get to my keyboard-fu with Emacs.</p>
-
-<p>If you have other cool things you are doing with Vim and Go that you
-think would impress me, let me know! I&rsquo;m still new to Vim, so I&rsquo;d love
-any feedback.</p>
-
-
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#vim">vim</a></li>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
-
 
 <p><a href="archives.html">More...</a></p>
 
@@ -554,11 +576,9 @@ any feedback.</p>
 </script>
 <script src="rainbow/js/language/generic.js"></script>
 
-<script src="rainbow/js/language/shell.js"></script>
-
 <script src="rainbow/js/language/go.js"></script>
 
-<script src="rainbow/js/language/html.js"></script>
+<script src="rainbow/js/language/shell.js"></script>
 
 
 <!-- Twitter Bootstrap. -->

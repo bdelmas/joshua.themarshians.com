@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Cross Compiling Go Applications</title>
+		
+		
+		<meta name="author" content="Joshua Marsh">
+		
+
+		<link rel="shortcut icon" href="favicon.ico" />
+
+		<!-- jQuery for bootstrap. -->
+		<script 
+			 src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js">
+		</script>
+
+		<!-- Center ads on ready. -->
+		<script type="text/javascript">
+			$(document).ready(function() {
+			if (window.innerWidth > 800) {
+			$(".centerad").css({"width": "728px"});
+			} else {
+			$(".centerad").css({"width": "320px"});
+			}
+			});
+		</script>
+
+		<!-- These are the style sheets for syntax highlighting. -->
+		<link type="text/css" rel="stylesheet" 
+					href="rainbow/css/github.css"/>
+
+		<!-- Twitter Bootstrap. -->
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+
+		<!-- Our own CSS. -->
+		<style>
+			body {
+			/* 60px to make the container go all the way to the bottom of the
+			topbar */
+			padding-top: 60px; 
+			}
+
+			footer {
+			text-align: center;
+			font-size: small;
+			}
+
+			.float-right {
+			float: right;
+			padding: 5px;
+			}
+
+			.centerad {
+			margin-left: auto;
+			margin-right: auto;
+			}
+		</style
+			 </head>
+	<body>
+		<div class="container">
+
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="index.html">
+							Non Impediti Ratione Cogitationis
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li >
+									<a href="index.html">
+										<i class="icon-home icon-white"></i>
+										Home
+									</a>
+								</li>
+								<li >
+									<a href="tags.html">
+										<i class="icon-tag icon-white"></i>
+										Tags
+									</a>
+								</li>
+								<li >
+									<a href="archives.html">
+										<i class="icon-hdd icon-white"></i>
+										Archives
+									</a>
+								</li>
+								<li >
+									<a href="about.html">
+										<i class="icon-user icon-white"></i>
+										About
+									</a>
+								</li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			
+      <h1>Cross Compiling Go Applications</h1>
+
+
+      <p>
+				<small id="entry-date">
+					2013-01-31
+				</small>
+			</p>
+
+<!-- Title: Cross Compiling Go Applications -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Tags: go,arch -->
+
+<!-- Languages: go,shell -->
+
+<p>In a recent discussion on
+<a href="https://plus.google.com/communities/114112804251407510571">Go&rsquo;s Google Plus Community</a>,
+some questions came up about cross compiling. In a default
+installation of <a href="http://golang.org/">Go</a>, cross compiling is not
+enabled. It only builds to toolchains for your current operating
+system and architecture. Since all of my computers are <em>amd64</em>, but
+some of the applications I build need to run on <em>i386</em>, I thought I&rsquo;d
+share how I go about doing it.</p>
+
+<p>I use <a href="https://www.archlinux.org/">Arch</a> linux, so I have provided a
+package in
+<a href="https://aur.archlinux.org/packages/go-cross-compilers-linux/">AUR</a>
+for doing this. It makes setup extremely simply. You can install the
+package by doing the following:</p>
+
+<pre><code data-language="shell">$ wget https://aur.archlinux.org/packages/go/go-cross-compilers-linux/PKGBUILD
+$ makepkg
+
+$ # For amd64
+$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-x86_64.pkg.tar.xz
+
+$ # For i386
+$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-i686.pkg.tar.xz
+</code></pre>
+
+<p>Now that the other toolchain is in place, we can make a sample program
+to test it out:</p>
+
+<pre><code data-language="go">package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    fmt.Println("Hello world!")
+}
+</code></pre>
+
+<p>If you were building it for your own architecture, something as simple
+as the following would work:</p>
+
+<pre><code data-language="shell">$ go build main.go
+$ ./main
+Hello world!
+</code></pre>
+
+<p>Building for the other architecture isn&rsquo;t much more difficult. Go will
+cross compile other operating systems and architectures based on the
+environmental variables <em>GOOS</em> and <em>GOOARCH</em>. In our case, we are
+interested in changing <em>GOARCH</em>:</p>
+
+<pre><code data-language="shell">$ GOARCH=386 go build main.go
+</code></pre>
+
+<p>Now you can copy main over your <em>i386</em> machine and run it! If you were
+cross compiling to <em>amd64</em>, you&rsquo;d simply replace <em>386</em> with <em>amd64</em>.</p>
+
+<p>One last interesting tidbit is that if you have a version of
+<a href="http://gcc.gnu.org/">gcc</a> that will cross compile, then Go
+applications that link to C libraries can also be used (despite what
+many people have suggested). In Arch, you can install a cross
+compiling version of <em>gcc</em> like this:</p>
+
+<pre><code data-language="shell">$ sudo pacman -S gcc-multilib
+</code></pre>
+
+<p>In this example, I&rsquo;m going to test a <a href="http://www.sqlite.org/">sqlite3</a>
+library, so let&rsquo;s install the 32-bit libraries:</p>
+
+<pre><code data-language="shell">$ sudo pacman -S lib32-sqlite
+</code></pre>
+
+<p>Now, we let&rsquo;s build a small app with the example from
+<a href="https://github.com/mattn/go-sqlite3">go-sqlite3</a>:</p>
+
+<pre><code data-language="shell">$ go get github.com/mattn/go-sqlite3
+$ mkdir testsql
+$ cd testsql
+$ wget https://raw.github.com/mattn/go-sqlite3/master/example/main.go
+
+$ # Test the program locally to make sure it works.
+$ go run main.go
+
+$ # Build for i386
+GOARCH=386 go build
+
+$ # Verify it's linked against the right libraries (lib32).
+$ ldd testsql
+    linux-gate.so.1 (0xf77ba000)
+    libsqlite3.so.0 => /usr/lib32/libsqlite3.so.0 (0xf76e2000)
+    libpthread.so.0 => /usr/lib32/libpthread.so.0 (0xf76c7000)
+    libc.so.6 => /usr/lib32/libc.so.6 (0xf7516000)
+    libdl.so.2 => /usr/lib32/libdl.so.2 (0xf7511000)
+    /lib/ld-linux.so.2 (0xf77bb000)
+
+$ # Test is on i386.
+scp testsql jmarsh@i386-box:
+ssh jmarsh@i386-box
+./testsql﻿
+</code></pre>
+
+<p>Obviously this could all be alleviated by using virtual machines, but
+the ability of the go toolchain to do this on a single system is
+really powerful. I can&rsquo;t begin to express how useful this is on many
+of the projects I&rsquo;ve worked on. I&rsquo;m always looking to improve, so if
+you can see ways to improve my PKGBUILD file or if you&rsquo;ve found a
+simpler way to do something, let me know.</p>
+
+
+
+      <div class="tags">
+				<ul>
+
+          <li><a href="tags.html#go">go</a></li>
+
+          <li><a href="tags.html#arch">arch</a></li>
+
+				</ul>
+      </div>
+
+
+
+			<div class="centerad">
+				<script type="text/javascript">
+					if (window.innerWidth > 800) {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (normal) */
+		google_ad_slot = "4997781473";
+		google_ad_width = 728;
+		google_ad_height = 90;
+		} else {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (mobile) */
+		google_ad_slot = "7951247872";
+		google_ad_width = 320;
+		google_ad_height = 50;
+		}
+</script>
+<script type="text/javascript"
+				src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+<footer>
+	<p>
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			<img alt="Creative Commons License" 
+					 style="border-width:0" 
+					 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+		</a>
+		<br />
+		This work is licensed under a 
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			Creative Commons Attribution 3.0 United States License
+		</a>.
+	</p>
+	<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+</footer>
+</div>
+
+<!-- These are the scripts for syntax highlighting. -->
+<script 
+	 src="//cdnjs.cloudflare.com/ajax/libs/rainbow/1.1.8/js/rainbow.min.js ">
+</script>
+<script src="rainbow/js/language/generic.js"></script>
+
+<script src="rainbow/js/language/go.js"></script>
+
+<script src="rainbow/js/language/shell.js"></script>
+
+
+<!-- Twitter Bootstrap. -->
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+
+<!-- Google Analytics. -->
+<script type="text/javascript">
+
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-37698200-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+
+</script>
+</body>
+</html>
