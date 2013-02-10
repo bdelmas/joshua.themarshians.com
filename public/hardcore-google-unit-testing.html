@@ -2,8 +2,12 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Index</title>
+		<title>Hardcore Google: Unit Testing App Engine</title>
 		
+		<meta name="description" content="I recently began a project using Go, AngularJS, and Google App Engine. In the first installment of a series of blog posts, I describe how I went about setting up unit testing for Google App Engine.">
+		
+		
+		<meta name="author" content="Joshua Marsh">
 		
 
 		<link rel="shortcut icon" href="favicon.ico" />
@@ -73,7 +77,7 @@
 						</a>
 						<div class="nav-collapse collapse">
 							<ul class="nav">
-								<li class="active">
+								<li >
 									<a href="index.html">
 										<i class="icon-home icon-white"></i>
 										Home
@@ -104,19 +108,16 @@
 			</div>
 
 			
-<div class="row">
-	<div class="span12">
-		
-		<h1><a href="hardcore-google-unit-testing.html">Hardcore Google: Unit Testing App Engine</a></h1>
-		
+      <h1>Hardcore Google: Unit Testing App Engine</h1>
 
-		<p>
-			<small id="entry-date">
-				2013-02-10
-			</small>
-		</p>
 
-		<!-- Title: Hardcore Google: Unit Testing App Engine -->
+      <p>
+				<small id="entry-date">
+					2013-02-10
+				</small>
+			</p>
+
+<!-- Title: Hardcore Google: Unit Testing App Engine -->
 
 <!-- Author: Joshua Marsh -->
 
@@ -284,279 +285,23 @@ hesitate to enter an issue or make a
 <a href="https://github.com/icub3d/appenginetesting/pulls">pull request</a>.</p>
 
 
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-				<li><a href="tags.html#appengine">appengine</a></li>
-				
-				<li><a href="tags.html#golang">golang</a></li>
-				
-				<li><a href="tags.html#angularjs">angularjs</a></li>
-				
-				<li><a href="tags.html#google">google</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
 
-<div class="row">
-	<div class="span12">
-		
-		<h1><a href="go-cross-compilers-linux.html">Cross Compiling Go Applications</a></h1>
-		
+      <div class="tags">
+				<ul>
 
-		<p>
-			<small id="entry-date">
-				2013-01-31
-			</small>
-		</p>
+          <li><a href="tags.html#go">go</a></li>
 
-		<!-- Title: Cross Compiling Go Applications -->
+          <li><a href="tags.html#appengine">appengine</a></li>
 
-<!-- Author: Joshua Marsh -->
+          <li><a href="tags.html#golang">golang</a></li>
 
-<!-- Tags: go,arch -->
+          <li><a href="tags.html#angularjs">angularjs</a></li>
 
-<!-- Languages: go,shell -->
+          <li><a href="tags.html#google">google</a></li>
 
-<p>In a recent discussion on
-<a href="https://plus.google.com/communities/114112804251407510571">Go&rsquo;s Google Plus Community</a>,
-some questions came up about cross compiling. In a default
-installation of <a href="http://golang.org/">Go</a>, cross compiling is not
-enabled. It only builds to toolchains for your current operating
-system and architecture. Since all of my computers are <em>amd64</em>, but
-some of the applications I build need to run on <em>i386</em>, I thought I&rsquo;d
-share how I go about doing it.</p>
+				</ul>
+      </div>
 
-<p>I use <a href="https://www.archlinux.org/">Arch</a> linux, so I have provided a
-package in
-<a href="https://aur.archlinux.org/packages/go-cross-compilers-linux/">AUR</a>
-for doing this. It makes setup extremely simply. You can install the
-package by doing the following:</p>
-
-<pre><code data-language="shell">$ wget https://aur.archlinux.org/packages/go/go-cross-compilers-linux/PKGBUILD
-$ makepkg
-
-$ # For amd64
-$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-x86_64.pkg.tar.xz
-
-$ # For i386
-$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-i686.pkg.tar.xz
-</code></pre>
-
-<p>Now that the other toolchain is in place, we can make a sample program
-to test it out:</p>
-
-<pre><code data-language="go">package main
-
-import (
-    "fmt"
-)
-
-func main() {
-    fmt.Println("Hello world!")
-}
-</code></pre>
-
-<p>If you were building it for your own architecture, something as simple
-as the following would work:</p>
-
-<pre><code data-language="shell">$ go build main.go
-$ ./main
-Hello world!
-</code></pre>
-
-<p>Building for the other architecture isn&rsquo;t much more difficult. Go will
-cross compile other operating systems and architectures based on the
-environmental variables <em>GOOS</em> and <em>GOOARCH</em>. In our case, we are
-interested in changing <em>GOARCH</em>:</p>
-
-<pre><code data-language="shell">$ GOARCH=386 go build main.go
-</code></pre>
-
-<p>Now you can copy main over your <em>i386</em> machine and run it! If you were
-cross compiling to <em>amd64</em>, you&rsquo;d simply replace <em>386</em> with <em>amd64</em>.</p>
-
-<p>One last interesting tidbit is that if you have a version of
-<a href="http://gcc.gnu.org/">gcc</a> that will cross compile, then Go
-applications that link to C libraries can also be used (despite what
-many people have suggested). In Arch, you can install a cross
-compiling version of <em>gcc</em> like this:</p>
-
-<pre><code data-language="shell">$ sudo pacman -S gcc-multilib
-</code></pre>
-
-<p>In this example, I&rsquo;m going to test a <a href="http://www.sqlite.org/">sqlite3</a>
-library, so let&rsquo;s install the 32-bit libraries:</p>
-
-<pre><code data-language="shell">$ sudo pacman -S lib32-sqlite
-</code></pre>
-
-<p>Now, we let&rsquo;s build a small app with the example from
-<a href="https://github.com/mattn/go-sqlite3">go-sqlite3</a>:</p>
-
-<pre><code data-language="shell">$ go get github.com/mattn/go-sqlite3
-$ mkdir testsql
-$ cd testsql
-$ wget https://raw.github.com/mattn/go-sqlite3/master/example/main.go
-
-$ # Test the program locally to make sure it works.
-$ go run main.go
-
-$ # Build for i386
-GOARCH=386 go build
-
-$ # Verify it's linked against the right libraries (lib32).
-$ ldd testsql
-    linux-gate.so.1 (0xf77ba000)
-    libsqlite3.so.0 => /usr/lib32/libsqlite3.so.0 (0xf76e2000)
-    libpthread.so.0 => /usr/lib32/libpthread.so.0 (0xf76c7000)
-    libc.so.6 => /usr/lib32/libc.so.6 (0xf7516000)
-    libdl.so.2 => /usr/lib32/libdl.so.2 (0xf7511000)
-    /lib/ld-linux.so.2 (0xf77bb000)
-
-$ # Test is on i386.
-scp testsql jmarsh@i386-box:
-ssh jmarsh@i386-box
-./testsql﻿
-</code></pre>
-
-<p>Obviously this could all be alleviated by using virtual machines, but
-the ability of the go toolchain to do this on a single system is
-really powerful. I can&rsquo;t begin to express how useful this is on many
-of the projects I&rsquo;ve worked on. I&rsquo;m always looking to improve, so if
-you can see ways to improve my PKGBUILD file or if you&rsquo;ve found a
-simpler way to do something, let me know.</p>
-
-
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-				<li><a href="tags.html#arch">arch</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
-
-<div class="row">
-	<div class="span12">
-		
-		<h1><a href="goblog.html">Colds, Static Blogs, and Go</a></h1>
-		
-
-		<p>
-			<small id="entry-date">
-				2013-01-29
-			</small>
-		</p>
-
-		<!-- Title: Colds, Static Blogs, and Go -->
-
-<!-- Author: Joshua Marsh -->
-
-<!-- Tags: go,blog,html -->
-
-<!-- Languages: shell -->
-
-<p>Last week in my <a href="http://plug.org/">local Linux user group</a> mailing
-list the topic of static blogging came up. I had been thinking of
-converting my blog over, but wasn&rsquo;t sure which one I&rsquo;d prefer to
-use. One of the responses to my inquiry was:</p>
-
-<blockquote>
-<p>If you&rsquo;ve been looking for a project with which to learn a new
-language, writing your own blog engine is a reasonable choice.  The
-&lsquo;market&rsquo; is already hopelessly polluted with toy blog engines, which
-is evidence for its suitability as a learning project.  Most of what
-makes a blog memorable has absolutely nothing to do with the
-back-end software, anyway.  If you are feeling ambitious, you could
-write a blog engine <em>and</em> your own Markdown parser with custom
-extensions
-(<a href="http://plug.org/pipermail/plug/2013-January/029154.html">Pearson, 2013</a>).</p>
-</blockquote>
-
-<p>I don&rsquo;t normally find myself with much time on my hands. I have two
-young children, school, a full-time job, and now a sister-in-law with
-crutches in the home. Misfortune (or fortune I suppose) befell me this
-weekend though and my son gave me a terrible cold. I was out of
-commission for the entire weekend.</p>
-
-<p>You can only watch so much
-<a href="http://www.usanetwork.com/series/psych/">Psych</a> and
-<a href="http://www.pbs.org/wgbh/masterpiece/downtonabbey/">Downton Abbey</a>, so
-I took upon myself the challenge of writing my own static blog
-application as suggested. Without further guilding the lilies, here
-it is: <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
-
-<p>I&rsquo;m so daring, that I&rsquo;ve even used it already to convert my existing
-blog at blogger into a static blog and I&rsquo;ve hosted it using
-appengine. If you are reading this, I can say that the software
-worked! What&rsquo;s nice about this all is that it&rsquo;s still
-free. <a href="https://github.com">Github</a> can host the code and I don&rsquo;t
-imagine myself exceeding the free limits of
-<a href="https://developers.google.com/appengine/">appengine</a>.</p>
-
-<p>It is certainly rough around the edges, but I was surprised what I
-could accomplish over a weekend while heavily medicated. I attribute a
-lot of the success to the tools already available to me. Go provides a
-<a href="http://golang.org/pkg/text/template/">template package</a> and
-<a href="https://github.com/russross/blackfriday">Russ Ross</a> already had a
-<a href="http://daringfireball.net/projects/markdown/">markdown</a> parser. The
-front-end is simply <a href="http://twitter.github.com/bootstrap/">bootstrap</a>,
-<a href="http://jquery.com/">jquery</a>, and
-<a href="http://craig.is/making/rainbows">rainbow</a>. It was merely a matter
-putting the pieces together.</p>
-
-<p>You can see a completed working example with my own
-<a href="http://joshua.themarshians.com/">blog</a> which originates from a
-<a href="https://github.com/icub3d/joshua.themarshians.com">project on github</a>. It
-works great for me, but I&rsquo;d be happy to entertain requests for
-changes. I tried to keep it simple, so it expects you to design the
-templates yourself but I imagine most DIY bloggers would want that
-anyway. All I do now to publish is:</p>
-
-<pre><code data-language="shell">$ goblog
-$ appcfg.py update joshua.themarshians.com
-</code></pre>
-
-<p>Overall, it was a fun weekend for me and not just because of the
-codeine. I can&rsquo;t say that I was a novice at Go, but I did learn a lot
-and hope to use the project as a springboard for more learning. I
-still need to add unit tests, improve the documentation, etc. All of
-those are sure to increase my knowledge of Go.</p>
-
-
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-				<li><a href="tags.html#blog">blog</a></li>
-				
-				<li><a href="tags.html#html">html</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
-
-
-<p><a href="archives.html">More...</a></p>
 
 
 			<div class="centerad">
