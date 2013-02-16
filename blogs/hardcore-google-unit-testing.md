@@ -4,6 +4,12 @@
 <!-- Tags: go,appengine,golang,angularjs,google -->
 <!-- Languages: shell,go -->
 
+This post is part of a series _Hardcore Google_. You can find other
+posts here:
+
+* [Unit Testing App Engine](hardcore-google-unit-testing.html)
+* [RESTful Web Services In Go](hardcore-google-communicating-go.html)
+
 I recently began a project using [Go](http://golang.org/),
 [AngularJS](http://angularjs.org/), and
 [Google App Engine](https://developers.google.com/appengine/). It is a

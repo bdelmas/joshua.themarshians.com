@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Hardcore Google: RESTful Web Services In Go</title>
+		
+		<meta name="description" content="I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to get Go to be a robust RESTful web service.">
+		
+		
+		<meta name="author" content="Joshua Marsh">
+		
+
+		<link rel="shortcut icon" href="favicon.ico" />
+
+		<!-- jQuery for bootstrap. -->
+		<script 
+			 src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js">
+		</script>
+
+		<!-- Center ads on ready. -->
+		<script type="text/javascript">
+			$(document).ready(function() {
+			if (window.innerWidth > 800) {
+			$(".centerad").css({"width": "728px"});
+			} else {
+			$(".centerad").css({"width": "320px"});
+			}
+			});
+		</script>
+
+		<!-- These are the style sheets for syntax highlighting. -->
+		<link type="text/css" rel="stylesheet" 
+					href="rainbow/css/github.css"/>
+
+		<!-- Twitter Bootstrap. -->
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+
+		<!-- Our own CSS. -->
+		<style>
+			body {
+			/* 60px to make the container go all the way to the bottom of the
+			topbar */
+			padding-top: 60px; 
+			}
+
+			footer {
+			text-align: center;
+			font-size: small;
+			}
+
+			.float-right {
+			float: right;
+			padding: 5px;
+			}
+
+			.centerad {
+			margin-left: auto;
+			margin-right: auto;
+			}
+		</style
+			 </head>
+	<body>
+		<div class="container">
+
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="index.html">
+							Non Impediti Ratione Cogitationis
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li >
+									<a href="index.html">
+										<i class="icon-home icon-white"></i>
+										Home
+									</a>
+								</li>
+								<li >
+									<a href="tags.html">
+										<i class="icon-tag icon-white"></i>
+										Tags
+									</a>
+								</li>
+								<li >
+									<a href="archives.html">
+										<i class="icon-hdd icon-white"></i>
+										Archives
+									</a>
+								</li>
+								<li >
+									<a href="about.html">
+										<i class="icon-user icon-white"></i>
+										About
+									</a>
+								</li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			
+      <h1>Hardcore Google: RESTful Web Services In Go</h1>
+
+
+      <p>
+				<small id="entry-date">
+					2013-02-16
+				</small>
+			</p>
+
+<!-- Title: Hardcore Google: RESTful Web Services In Go -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Description: I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to get Go to be a robust RESTful web service. -->
+
+<!-- Tags: go,appengine,golang,angularjs,google -->
+
+<!-- Languages: go -->
+
+<p>This post is part of a series <em>Hardcore Google</em>. You can find other
+posts here:</p>
+
+<ul>
+<li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
+<li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
+</ul>
+
+<p>When you first start developing a web application, one of the first
+big decision you make after choosing your tool set is how these tools
+will interact with each other. For my project, I had already chosen
+<a href="http://golang.org/">Go</a> for my back-end,
+<a href="http://angularjs.org/">AngularJS</a> for by front-end, and
+<a href="https://developers.google.com/appengine/">Google App Engine</a> to host
+it all. It was just a matter of figuring out how to get Go and
+AngularJS to communicate with each other. Fortunately doing that was
+stupid-simple.</p>
+
+<p>I chose a
+<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>ful
+API for communication because it seemed to be the most organized
+method of communication and both sides of the web application support
+it quite well. I&rsquo;ve found in my development career that trying to fit
+a square peg into a round hole only makes you lose your hair
+faster, so REST it was.</p>
+
+<p>Using a RESTful web service means that you&rsquo;ll be managing your data
+based on the HTTP method (i.e. GET, POST, DELETE, etc.) and URL. On
+the Go side of things, you&rsquo;ll be using the
+<a href="http://golang.org/pkg/net/http/">net/http</a> package to handle the
+requests from AngularJS. At a high level, you tell Go to handle a
+request like this:</p>
+
+<pre><code data-language="go">http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "Thanks for the %s!", r.Method)
+})
+</code></pre>
+
+<p>Here we register a function to handle all requests to <em>/bar</em>. Every
+function that handles a request has the same function definition: it
+has as its parameters an http.ResponseWriter which is used to write a
+response and an http.Request which contains the details of the request
+being made. In this case, if we started up this server, and made the
+request &ldquo;DELETE /bar&rdquo;, we&rsquo;d receive back &ldquo;Thanks for the DELETE!&rdquo;</p>
+
+<p>Hopefully, you can see where this is going. To implement a RESTful API
+in Go, you would register handlers for each URL endpoint and then
+based on the given method you&rsquo;d perform an operation. We can make this
+process even better though by using
+<a href="http://www.gorillatoolkit.org/pkg/mux">gorilla/mux</a>. It is a drop in
+replacement for Go&rsquo;s http handlers, but it can take care of the details
+of routing based on the HTTP method. Here is an example:</p>
+
+<pre><code data-language="go">m := mux.NewRouter()
+
+// Get all lists.
+m.HandleFunc("/", GetAllLists).Methods("GET")
+
+// Make a new list.
+m.HandleFunc("/", PostList).Methods("POST")
+
+// Singe list operations.
+m.HandleFunc("/{key}/", GetList).Methods("GET")
+m.HandleFunc("/{key}/", PutList).Methods("PUT")
+m.HandleFunc("/{key}/", DeleteList).Methods("DELETE")
+
+// Everything else fails.
+m.HandleFunc("/{path:.*}", gorca.NotFoundFunc)
+</code></pre>
+
+<p>As you can see, I register handlers for each of the REST methods I&rsquo;m
+interested in. In this example, I&rsquo;m registering some functionality for
+the list part of my web application. I can either <em>GET</em> all of the
+lists or <em>POST</em> a new list at the root (<em>/</em>). If I&rsquo;m given a key
+(<em>/{key}/</em>) in the URL, then I&rsquo;m dealing with a specific list. In that
+case, I can get the list, update the list, or delete with list with
+<em>GET</em>, <em>PUT</em>, and <em>DELETE</em>.</p>
+
+<p>The last <em>HandleFunc</em> acts as a catch all. If the client makes a
+request that isn&rsquo;t one explicitly listed, we return a 404 status and a
+JSON response with the details. The <em>net/http</em> package already returns
+a simple 404, but I wanted to return a JSON response as well. Using
+the catch all allows me to send that JSON response. The client can
+then present a useful message to the user should something go wrong
+instead of a somewhat useless &ldquo;Not Found&rdquo;.</p>
+
+<p>As an example of how the handlers look, the <em>GetAllLists</em> handler
+looks like this:</p>
+
+<pre><code data-language="go">// GetAllLists fetches all of the lists.
+func GetAllLists(w http.ResponseWriter, r *http.Request) {
+    // Create the query.
+    c := appengine.NewContext(r)
+    q := datastore.NewQuery("List").Order("-LastModified")
+
+    // Fetch the lists. 
+    lists := []List{}
+    if _, err := q.GetAll(c, &lists); err != nil {
+        gorca.LogAndUnexpected(c, w, r, err)
+        return
+    }
+
+    // Write the lists as JSON.
+    gorca.WriteJSON(c, w, r, lists)
+}
+</code></pre>
+
+<p>Some of the details may be fuzzy if you aren&rsquo;t familiar with App
+Engine, but I basically fetch all of the lists from App Engine&rsquo;s
+<a href="https://developers.google.com/appengine/docs/go/datastore/">datastore</a>
+and then convert it to <a href="http://www.json.org/">JSON</a> and send that as
+the response.</p>
+
+<p>The <em>GetAllLists</em> function is a great example of how Go and App Engine
+interact to make development simple. In just a couple of dozen lines
+of code, I can create a robust REST web service. I don&rsquo;t have to deal
+with <a href="http://www.mysql.com/">MySQL</a> connections, user authentication,
+or parsing incoming HTTP requests. App Engine and Go do all that for
+me. The net result is that I have more readable, testable, and
+maintainable code.</p>
+
+<p>You can see how I hooked this all up in more detail in
+my application:</p>
+
+<ul>
+<li><a href="https://github.com/icub3d/home/">Home App</a></li>
+<li><a href="https://github.com/icub3d/home/blob/master/rest/rest.go">The Global Handler</a></li>
+<li><a href="https://github.com/icub3d/home/blob/master/rest/list/muxer.go">The List Handler</a></li>
+<li><a href="https://github.com/icub3d/home/tree/master/rest/list">The List Handler Functions</a></li>
+</ul>
+
+<p>I was truly surprised at how easy this process was. Rigging up a
+back-end can be a nightmare. At work, I deal with a
+<a href="http://en.wikipedia.org/wiki/SOAP">SOAP</a> web service and I am willing
+to testify in court that the &rsquo;S&rsquo; (simple) is a lie. With Go, this
+isn&rsquo;t the case. It already provides great functionality and the open
+source nature of the language means that great packages like
+<em>gorilla/mux</em> are there when you want them. Stay tuned, for next
+time. I&rsquo;ll talk about getting AngularJS to consume and present the
+JSON we are sending back.</p>
+
+
+
+      <div class="tags">
+				<ul>
+
+          <li><a href="tags.html#go">go</a></li>
+
+          <li><a href="tags.html#appengine">appengine</a></li>
+
+          <li><a href="tags.html#golang">golang</a></li>
+
+          <li><a href="tags.html#angularjs">angularjs</a></li>
+
+          <li><a href="tags.html#google">google</a></li>
+
+				</ul>
+      </div>
+
+
+
+			<div class="centerad">
+				<script type="text/javascript">
+					if (window.innerWidth > 800) {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (normal) */
+		google_ad_slot = "4997781473";
+		google_ad_width = 728;
+		google_ad_height = 90;
+		} else {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (mobile) */
+		google_ad_slot = "7951247872";
+		google_ad_width = 320;
+		google_ad_height = 50;
+		}
+</script>
+<script type="text/javascript"
+				src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+<footer>
+	<p>
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			<img alt="Creative Commons License" 
+					 style="border-width:0" 
+					 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+		</a>
+		<br />
+		This work is licensed under a 
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			Creative Commons Attribution 3.0 United States License
+		</a>.
+	</p>
+	<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+</footer>
+</div>
+
+<!-- These are the scripts for syntax highlighting. -->
+<script 
+	 src="//cdnjs.cloudflare.com/ajax/libs/rainbow/1.1.8/js/rainbow.min.js ">
+</script>
+<script src="rainbow/js/language/generic.js"></script>
+
+<script src="rainbow/js/language/go.js"></script>
+
+
+<!-- Twitter Bootstrap. -->
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+
+<!-- Google Analytics. -->
+<script type="text/javascript">
+
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-37698200-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+
+</script>
+</body>
+</html>

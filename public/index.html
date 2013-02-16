@@ -107,6 +107,191 @@
 <div class="row">
 	<div class="span12">
 		
+		<h1><a href="hardcore-google-communicating-go.html">Hardcore Google: RESTful Web Services In Go</a></h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2013-02-16
+			</small>
+		</p>
+
+		<!-- Title: Hardcore Google: RESTful Web Services In Go -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Description: I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to get Go to be a robust RESTful web service. -->
+
+<!-- Tags: go,appengine,golang,angularjs,google -->
+
+<!-- Languages: go -->
+
+<p>This post is part of a series <em>Hardcore Google</em>. You can find other
+posts here:</p>
+
+<ul>
+<li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
+<li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
+</ul>
+
+<p>When you first start developing a web application, one of the first
+big decision you make after choosing your tool set is how these tools
+will interact with each other. For my project, I had already chosen
+<a href="http://golang.org/">Go</a> for my back-end,
+<a href="http://angularjs.org/">AngularJS</a> for by front-end, and
+<a href="https://developers.google.com/appengine/">Google App Engine</a> to host
+it all. It was just a matter of figuring out how to get Go and
+AngularJS to communicate with each other. Fortunately doing that was
+stupid-simple.</p>
+
+<p>I chose a
+<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>ful
+API for communication because it seemed to be the most organized
+method of communication and both sides of the web application support
+it quite well. I&rsquo;ve found in my development career that trying to fit
+a square peg into a round hole only makes you lose your hair
+faster, so REST it was.</p>
+
+<p>Using a RESTful web service means that you&rsquo;ll be managing your data
+based on the HTTP method (i.e. GET, POST, DELETE, etc.) and URL. On
+the Go side of things, you&rsquo;ll be using the
+<a href="http://golang.org/pkg/net/http/">net/http</a> package to handle the
+requests from AngularJS. At a high level, you tell Go to handle a
+request like this:</p>
+
+<pre><code data-language="go">http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "Thanks for the %s!", r.Method)
+})
+</code></pre>
+
+<p>Here we register a function to handle all requests to <em>/bar</em>. Every
+function that handles a request has the same function definition: it
+has as its parameters an http.ResponseWriter which is used to write a
+response and an http.Request which contains the details of the request
+being made. In this case, if we started up this server, and made the
+request &ldquo;DELETE /bar&rdquo;, we&rsquo;d receive back &ldquo;Thanks for the DELETE!&rdquo;</p>
+
+<p>Hopefully, you can see where this is going. To implement a RESTful API
+in Go, you would register handlers for each URL endpoint and then
+based on the given method you&rsquo;d perform an operation. We can make this
+process even better though by using
+<a href="http://www.gorillatoolkit.org/pkg/mux">gorilla/mux</a>. It is a drop in
+replacement for Go&rsquo;s http handlers, but it can take care of the details
+of routing based on the HTTP method. Here is an example:</p>
+
+<pre><code data-language="go">m := mux.NewRouter()
+
+// Get all lists.
+m.HandleFunc("/", GetAllLists).Methods("GET")
+
+// Make a new list.
+m.HandleFunc("/", PostList).Methods("POST")
+
+// Singe list operations.
+m.HandleFunc("/{key}/", GetList).Methods("GET")
+m.HandleFunc("/{key}/", PutList).Methods("PUT")
+m.HandleFunc("/{key}/", DeleteList).Methods("DELETE")
+
+// Everything else fails.
+m.HandleFunc("/{path:.*}", gorca.NotFoundFunc)
+</code></pre>
+
+<p>As you can see, I register handlers for each of the REST methods I&rsquo;m
+interested in. In this example, I&rsquo;m registering some functionality for
+the list part of my web application. I can either <em>GET</em> all of the
+lists or <em>POST</em> a new list at the root (<em>/</em>). If I&rsquo;m given a key
+(<em>/{key}/</em>) in the URL, then I&rsquo;m dealing with a specific list. In that
+case, I can get the list, update the list, or delete with list with
+<em>GET</em>, <em>PUT</em>, and <em>DELETE</em>.</p>
+
+<p>The last <em>HandleFunc</em> acts as a catch all. If the client makes a
+request that isn&rsquo;t one explicitly listed, we return a 404 status and a
+JSON response with the details. The <em>net/http</em> package already returns
+a simple 404, but I wanted to return a JSON response as well. Using
+the catch all allows me to send that JSON response. The client can
+then present a useful message to the user should something go wrong
+instead of a somewhat useless &ldquo;Not Found&rdquo;.</p>
+
+<p>As an example of how the handlers look, the <em>GetAllLists</em> handler
+looks like this:</p>
+
+<pre><code data-language="go">// GetAllLists fetches all of the lists.
+func GetAllLists(w http.ResponseWriter, r *http.Request) {
+    // Create the query.
+    c := appengine.NewContext(r)
+    q := datastore.NewQuery("List").Order("-LastModified")
+
+    // Fetch the lists. 
+    lists := []List{}
+    if _, err := q.GetAll(c, &lists); err != nil {
+        gorca.LogAndUnexpected(c, w, r, err)
+        return
+    }
+
+    // Write the lists as JSON.
+    gorca.WriteJSON(c, w, r, lists)
+}
+</code></pre>
+
+<p>Some of the details may be fuzzy if you aren&rsquo;t familiar with App
+Engine, but I basically fetch all of the lists from App Engine&rsquo;s
+<a href="https://developers.google.com/appengine/docs/go/datastore/">datastore</a>
+and then convert it to <a href="http://www.json.org/">JSON</a> and send that as
+the response.</p>
+
+<p>The <em>GetAllLists</em> function is a great example of how Go and App Engine
+interact to make development simple. In just a couple of dozen lines
+of code, I can create a robust REST web service. I don&rsquo;t have to deal
+with <a href="http://www.mysql.com/">MySQL</a> connections, user authentication,
+or parsing incoming HTTP requests. App Engine and Go do all that for
+me. The net result is that I have more readable, testable, and
+maintainable code.</p>
+
+<p>You can see how I hooked this all up in more detail in
+my application:</p>
+
+<ul>
+<li><a href="https://github.com/icub3d/home/">Home App</a></li>
+<li><a href="https://github.com/icub3d/home/blob/master/rest/rest.go">The Global Handler</a></li>
+<li><a href="https://github.com/icub3d/home/blob/master/rest/list/muxer.go">The List Handler</a></li>
+<li><a href="https://github.com/icub3d/home/tree/master/rest/list">The List Handler Functions</a></li>
+</ul>
+
+<p>I was truly surprised at how easy this process was. Rigging up a
+back-end can be a nightmare. At work, I deal with a
+<a href="http://en.wikipedia.org/wiki/SOAP">SOAP</a> web service and I am willing
+to testify in court that the &rsquo;S&rsquo; (simple) is a lie. With Go, this
+isn&rsquo;t the case. It already provides great functionality and the open
+source nature of the language means that great packages like
+<em>gorilla/mux</em> are there when you want them. Stay tuned, for next
+time. I&rsquo;ll talk about getting AngularJS to consume and present the
+JSON we are sending back.</p>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+				<li><a href="tags.html#appengine">appengine</a></li>
+				
+				<li><a href="tags.html#golang">golang</a></li>
+				
+				<li><a href="tags.html#angularjs">angularjs</a></li>
+				
+				<li><a href="tags.html#google">google</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+<div class="row">
+	<div class="span12">
+		
 		<h1><a href="hardcore-google-unit-testing.html">Hardcore Google: Unit Testing App Engine</a></h1>
 		
 
@@ -125,6 +310,14 @@
 <!-- Tags: go,appengine,golang,angularjs,google -->
 
 <!-- Languages: shell,go -->
+
+<p>This post is part of a series <em>Hardcore Google</em>. You can find other
+posts here:</p>
+
+<ul>
+<li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
+<li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
+</ul>
 
 <p>I recently began a project using <a href="http://golang.org/">Go</a>,
 <a href="http://angularjs.org/">AngularJS</a>, and
@@ -450,111 +643,6 @@ simpler way to do something, let me know.</p>
 </div>
 <hr>
 
-<div class="row">
-	<div class="span12">
-		
-		<h1><a href="goblog.html">Colds, Static Blogs, and Go</a></h1>
-		
-
-		<p>
-			<small id="entry-date">
-				2013-01-29
-			</small>
-		</p>
-
-		<!-- Title: Colds, Static Blogs, and Go -->
-
-<!-- Author: Joshua Marsh -->
-
-<!-- Tags: go,blog,html -->
-
-<!-- Languages: shell -->
-
-<p>Last week in my <a href="http://plug.org/">local Linux user group</a> mailing
-list the topic of static blogging came up. I had been thinking of
-converting my blog over, but wasn&rsquo;t sure which one I&rsquo;d prefer to
-use. One of the responses to my inquiry was:</p>
-
-<blockquote>
-<p>If you&rsquo;ve been looking for a project with which to learn a new
-language, writing your own blog engine is a reasonable choice.  The
-&lsquo;market&rsquo; is already hopelessly polluted with toy blog engines, which
-is evidence for its suitability as a learning project.  Most of what
-makes a blog memorable has absolutely nothing to do with the
-back-end software, anyway.  If you are feeling ambitious, you could
-write a blog engine <em>and</em> your own Markdown parser with custom
-extensions
-(<a href="http://plug.org/pipermail/plug/2013-January/029154.html">Pearson, 2013</a>).</p>
-</blockquote>
-
-<p>I don&rsquo;t normally find myself with much time on my hands. I have two
-young children, school, a full-time job, and now a sister-in-law with
-crutches in the home. Misfortune (or fortune I suppose) befell me this
-weekend though and my son gave me a terrible cold. I was out of
-commission for the entire weekend.</p>
-
-<p>You can only watch so much
-<a href="http://www.usanetwork.com/series/psych/">Psych</a> and
-<a href="http://www.pbs.org/wgbh/masterpiece/downtonabbey/">Downton Abbey</a>, so
-I took upon myself the challenge of writing my own static blog
-application as suggested. Without further guilding the lilies, here
-it is: <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
-
-<p>I&rsquo;m so daring, that I&rsquo;ve even used it already to convert my existing
-blog at blogger into a static blog and I&rsquo;ve hosted it using
-appengine. If you are reading this, I can say that the software
-worked! What&rsquo;s nice about this all is that it&rsquo;s still
-free. <a href="https://github.com">Github</a> can host the code and I don&rsquo;t
-imagine myself exceeding the free limits of
-<a href="https://developers.google.com/appengine/">appengine</a>.</p>
-
-<p>It is certainly rough around the edges, but I was surprised what I
-could accomplish over a weekend while heavily medicated. I attribute a
-lot of the success to the tools already available to me. Go provides a
-<a href="http://golang.org/pkg/text/template/">template package</a> and
-<a href="https://github.com/russross/blackfriday">Russ Ross</a> already had a
-<a href="http://daringfireball.net/projects/markdown/">markdown</a> parser. The
-front-end is simply <a href="http://twitter.github.com/bootstrap/">bootstrap</a>,
-<a href="http://jquery.com/">jquery</a>, and
-<a href="http://craig.is/making/rainbows">rainbow</a>. It was merely a matter
-putting the pieces together.</p>
-
-<p>You can see a completed working example with my own
-<a href="http://joshua.themarshians.com/">blog</a> which originates from a
-<a href="https://github.com/icub3d/joshua.themarshians.com">project on github</a>. It
-works great for me, but I&rsquo;d be happy to entertain requests for
-changes. I tried to keep it simple, so it expects you to design the
-templates yourself but I imagine most DIY bloggers would want that
-anyway. All I do now to publish is:</p>
-
-<pre><code data-language="shell">$ goblog
-$ appcfg.py update joshua.themarshians.com
-</code></pre>
-
-<p>Overall, it was a fun weekend for me and not just because of the
-codeine. I can&rsquo;t say that I was a novice at Go, but I did learn a lot
-and hope to use the project as a springboard for more learning. I
-still need to add unit tests, improve the documentation, etc. All of
-those are sure to increase my knowledge of Go.</p>
-
-
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-				<li><a href="tags.html#blog">blog</a></li>
-				
-				<li><a href="tags.html#html">html</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
-
 
 <p><a href="archives.html">More...</a></p>
 
@@ -604,9 +692,9 @@ those are sure to increase my knowledge of Go.</p>
 </script>
 <script src="rainbow/js/language/generic.js"></script>
 
-<script src="rainbow/js/language/shell.js"></script>
-
 <script src="rainbow/js/language/go.js"></script>
+
+<script src="rainbow/js/language/shell.js"></script>
 
 
 <!-- Twitter Bootstrap. -->
