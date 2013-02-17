@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <lastBuildDate>17 Feb 13 09:24 MST</lastBuildDate> 
+    <title>Non Impediti Ratione Cogitationis</title>
+		<link>http://joshua.themarshians.com/</link>
+		<description>
+			My attempt to provide useful information to the puplic.
+		</description>
+		<category>Development</category>
+		<category>Web Development</category>
+		<category>Software Development</category>
+		<copyright>
+			This work is licensed under a Creative Commons Attribution 3.0
+			United States License:
+			http://creativecommons.org/licenses/by/3.0/us/.
+		</copyright>
+		<image>
+			<url>http://joshua.themarshians.com/favicon.ico</url>
+			<title>Non Impediti Ratione Cogitationis</title>
+			<link>http://joshua.themarshians.com/</link>
+		</image>
+		<language>en-us</language>
+ 
+    <item>
+      <title>Hardcore Google: RESTful Web Services In Go</title>
+      <link>http://joshua.themarshians.com/hardcore-google-communicating-go.html</link>
+      <description>I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to get Go to be a robust RESTful web service.</description>
+      <pubDate>16 Feb 13 09:15 MST</pubDate>
+      <category>go</category>
+      <category>appengine</category>
+      <category>golang</category>
+      <category>angularjs</category>
+      <category>google</category>
+    </item>
+    <item>
+      <title>Hardcore Google: Unit Testing App Engine</title>
+      <link>http://joshua.themarshians.com/hardcore-google-unit-testing.html</link>
+      <description>I recently began a project using Go, AngularJS, and Google App Engine. In the first installment of a series of blog posts, I describe how I went about setting up unit testing for Google App Engine.</description>
+      <pubDate>10 Feb 13 12:26 MST</pubDate>
+      <category>go</category>
+      <category>appengine</category>
+      <category>golang</category>
+      <category>angularjs</category>
+      <category>google</category>
+    </item>
+    <item>
+      <title>Cross Compiling Go Applications</title>
+      <link>http://joshua.themarshians.com/go-cross-compilers-linux.html</link>
+      <description></description>
+      <pubDate>31 Jan 13 13:49 MST</pubDate>
+      <category>go</category>
+      <category>arch</category>
+    </item>
+    <item>
+      <title>Colds, Static Blogs, and Go</title>
+      <link>http://joshua.themarshians.com/goblog.html</link>
+      <description></description>
+      <pubDate>29 Jan 13 16:04 MST</pubDate>
+      <category>go</category>
+      <category>blog</category>
+      <category>html</category>
+    </item>
+    <item>
+      <title>Go App, Do You Read Me?</title>
+      <link>http://joshua.themarshians.com/go-app-do-you-read-me.html</link>
+      <description></description>
+      <pubDate>17 Jan 13 00:00 MST</pubDate>
+      <category>rpc</category>
+      <category>go</category>
+      <category>linux</category>
+    </item>
+    <item>
+      <title>Vim and Go</title>
+      <link>http://joshua.themarshians.com/vim-and-go.html</link>
+      <description></description>
+      <pubDate>09 Jan 13 00:00 MST</pubDate>
+      <category>vim</category>
+      <category>go</category>
+    </item>
+    <item>
+      <title>Private Git Repos And Go</title>
+      <link>http://joshua.themarshians.com/private-git-repos-and-go.html</link>
+      <description></description>
+      <pubDate>23 Dec 12 00:00 MST</pubDate>
+      <category>git</category>
+      <category>go</category>
+    </item>
+    <item>
+      <title>America Is Falling For It</title>
+      <link>http://joshua.themarshians.com/america-is-falling-for-it.html</link>
+      <description></description>
+      <pubDate>23 Oct 12 00:00 MDT</pubDate>
+      <category>america</category>
+    </item>
+    <item>
+      <title>Every American Should See Wicked</title>
+      <link>http://joshua.themarshians.com/every-american-should-see-wicked.html</link>
+      <description></description>
+      <pubDate>12 Aug 12 00:00 MDT</pubDate>
+      <category>wicked</category>
+      <category>america</category>
+    </item>
+    <item>
+      <title>Determining Determinism</title>
+      <link>http://joshua.themarshians.com/determining-determinism.html</link>
+      <description></description>
+      <pubDate>03 Aug 12 00:00 MDT</pubDate>
+      <category>determinism</category>
+      <category>memoization</category>
+      <category>go</category>
+      <category>recursion</category>
+    </item>
+
+  </channel>
+</rss>
