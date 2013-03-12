@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Hardcore Google: RESTful Communication With AngularJS</title>
+		
+		<meta name="description" content="I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to use AngularJS and get it communicating with Go.">
+		
+		
+		<meta name="author" content="Joshua Marsh">
+		
+
+		<link rel="shortcut icon" href="favicon.ico" />
+		<link rel="alternate" type="application/rss+xml" 
+					href="http://joshua.themarshians.com/feed.rss" />
+
+		<!-- jQuery for bootstrap. -->
+		<script 
+			 src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js">
+		</script>
+
+		<!-- Center ads on ready. -->
+		<script type="text/javascript">
+			$(document).ready(function() {
+			if (window.innerWidth > 800) {
+			$(".centerad").css({"width": "728px"});
+			} else {
+			$(".centerad").css({"width": "320px"});
+			}
+			});
+		</script>
+
+		<!-- These are the style sheets for syntax highlighting. -->
+		<link type="text/css" rel="stylesheet" 
+					href="rainbow/css/github.css"/>
+
+		<!-- Twitter Bootstrap. -->
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+
+		<!-- Our own CSS. -->
+		<style>
+			body {
+			/* 60px to make the container go all the way to the bottom of the
+			topbar */
+			padding-top: 60px; 
+			}
+
+			footer {
+			text-align: center;
+			font-size: small;
+			}
+
+			.float-right {
+			float: right;
+			padding: 5px;
+			}
+
+			.centerad {
+			margin-left: auto;
+			margin-right: auto;
+			}
+		</style
+			 </head>
+	<body>
+		<div class="container">
+
+			<!-- This is the top navigation bar. -->
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="btn btn-navbar" data-toggle="collapse" 
+							 data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+						<a class="brand" href="index.html">
+							Non Impediti Ratione Cogitationis
+						</a>
+						<div class="nav-collapse collapse">
+							<ul class="nav">
+								<li >
+									<a href="index.html">
+										<i class="icon-home icon-white"></i>
+										Home
+									</a>
+								</li>
+								<li >
+									<a href="tags.html">
+										<i class="icon-tag icon-white"></i>
+										Tags
+									</a>
+								</li>
+								<li >
+									<a href="archives.html">
+										<i class="icon-hdd icon-white"></i>
+										Archives
+									</a>
+								</li>
+								<li >
+									<a href="about.html">
+										<i class="icon-user icon-white"></i>
+										About
+									</a>
+								</li>
+								<li>
+									<a href="feed.rss">
+										<i class="icon-th-list icon-white"></i>
+										RSS
+									</a>
+								</li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			
+      <h1>Hardcore Google: RESTful Communication With AngularJS</h1>
+
+
+      <p>
+				<small id="entry-date">
+					2013-03-12
+				</small>
+			</p>
+
+<!-- Title: Hardcore Google: RESTful Communication With AngularJS -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Description: I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to use AngularJS and get it communicating with Go. -->
+
+<!-- Tags: go,appengine,golang,angularjs,google -->
+
+<!-- Languages: go,javascript -->
+
+<p>This post is part of a series <em>Hardcore Google</em>. You can find other
+posts here:</p>
+
+<ul>
+<li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
+<li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
+<li><a href="hardcore-google-communicating-angularjs.html">RESTful Communication With AngularJS</a></li>
+</ul>
+
+<p>My history with <a href="http://en.wikipedia.org/wiki/JavaScript">JavaScript</a>
+goes back almost 15 years. Back then, working in the browser was was
+difficult. Eventually tools like <a href="http://jquery.com/">jQuery</a> came
+around and made the work somewhat simpler. It wasn&rsquo;t until I
+discovered <a href="http://angularjs.org/">AngularJS</a> though that I felt like
+JavaScript development had come out of adolescence. AngularJS does a
+great job at solving problems that professional engineers often find
+clunky with JavaScript &emdash; namely separating the
+<a href="http://en.wikipedia.org/wiki/HTML">HTML</a> and
+<a href="http://en.wikipedia.org/wiki/CSS">CSS</a> from the code that drives it,
+properly testing code, and developing rich, dynamic web
+applications. What I love about AngularJS as well is that it doesn&rsquo;t
+doesn&rsquo;t try to get away from using JavaScript but merely enhance it.</p>
+
+<p>Enough gushing though. If you are new to AngularJS, you can find great
+tutorials on their website or you can contact me directly. What I&rsquo;m
+interested in talking about today is how AngularJS interacts with web
+services, particularly
+<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>ful
+web services. In my
+<a href="hardcore-google-communicating-go.html">last post</a>, we got
+<a href="http://golang.org/">Go</a> to serve our web services. Now we just need
+our front end web app to communicate with that service.</p>
+
+<p>AngularJS provides two ways to wire up a back end. The simplest method
+is to use the
+<a href="http://docs.angularjs.org/api/ngResource.$resource">$resource</a>
+service. It provides a simple interface to a web service. If you need
+finer grained control though, you can use the
+<a href="http://docs.angularjs.org/api/ng.$http">$http</a> service. I&rsquo;ll show you
+below how to use the <em>$http</em> service because that&rsquo;s what I ended up
+going with. If you decide to use the <em>$resource</em> service though, just
+keep in mind that it currently always strips the trailing slash wether
+you ask it to or not. You&rsquo;ll need to have your
+<a href="http://golang.org/pkg/net/http/">http.Handler</a>s account for that. For
+example:</p>
+
+<pre><code data-language="go">func fooHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "Thanks for the %s!", r.Method)
+}
+
+// Handle /foo
+http.HandleFunc("/foo", fooHandler)
+
+// Or Handle /foo/
+http.HandleFunc("/foo/", fooHandler)
+</code></pre>
+
+<p>Before, we go about using the <em>$http</em> service though, we need to talk
+about services in general. Like the <em>$http</em> and <em>$resource</em> services
+that AngularJS provides, you can create your own. Services are a great
+way to decouple code such as connecting to a web service. You can
+<a href="http://en.wikipedia.org/wiki/Mock_object">mock</a> them when you are
+testing the parts of your application that use them and AngularJS will
+manage the instantiation and destruction of the services for you. You
+can find a complete example of a user defined service in the file
+<a href="https://github.com/icub3d/home/blob/master/dev/js/rest/lists.js">list.js</a>.</p>
+
+<p>Let&rsquo;s walk through the create function. It handles the creation of new
+lists or making copies of existing lists. We start by making a <em>POST</em>
+using the <em>$http</em> service.</p>
+
+<pre><code data-language="javascript">var promise = $http.post("/rest/list/", data);
+</code></pre>
+
+<p>This performs an HTTP POST to the URL <em>&rdquo;/rest/list/&rdquo;</em> with the JSON
+data as the content of the POST. There are similar functions for
+<em>put</em>, <em>get</em>, and <em>delete</em> that correspond to the HTTP <em>PUT</em>, <em>GET</em>
+and <em>DELETE</em> methods. The data could technically be anything. In this
+case though, it&rsquo;s a JavaScript object that contains the information
+necessary to create the new list. AngularJS will take care of
+converting the object into JSON that our Go web service can consume.</p>
+
+<p>The <a href="http://wiki.commonjs.org/wiki/Promises">promise</a> returned allows
+you to hook a success and failure function to the asynchronous
+response to the request. Here, we call the <em>scall</em> or <em>ecall</em>
+functions based on the success or failure of the <em>POST</em>. A similar
+thing happens in all the other functions for the service. In the <em>get</em>
+function, for example, we do the same thing. The only thing that
+differs is that we expect a key for the list being retrieved.</p>
+
+<pre><code data-language="javascript">this.get = function(key, scall, ecall) {
+    var promise = $http.get("/rest/list/" + key + "/");
+    ...
+</code></pre>
+
+<p>You can see an example of using both of these functions and the
+service in the
+<a href="https://github.com/icub3d/home/blob/master/dev/js/lists/all.js">all.js</a>
+file in the <em>$scope.copy</em> function:</p>
+
+<pre><code data-language="javascript">$scope.copy = function() {
+    Lists.get($scope.data.key, function(l) {
+        l.Name = $scope.data.name;
+        Lists.create(l, function(nl) {
+                $location.path('/lists/view/' + nl.Key + '/');
+        });
+    });
+};
+</code></pre>
+
+<p>The goal of the <em>copy</em> function is to make a copy of a list with a new
+name. We do that by <em>get*ting the list to be copied by its key. If
+that succeeds, we change the list name and call the *create</em> function
+for that list. If it succeeds, then we redirect to the new list.</p>
+
+<p>I like this function because it shows the simplicity of using
+AngularJS&rsquo;s frameworks. I can make two service calls in just a few
+lines of code to do something meaningful with the application. It also
+exemplifies the notion of &ldquo;going with the flow.&rdquo; Most libraries or
+programming languages have a right and wrong way of doing things. If
+you do it the right way, you can get a lot of functionality with just
+a few lines of code. This makes your code both easier to read and
+maintain.</p>
+
+
+
+      <div class="tags">
+				<ul>
+
+          <li><a href="tags.html#go">go</a></li>
+
+          <li><a href="tags.html#appengine">appengine</a></li>
+
+          <li><a href="tags.html#golang">golang</a></li>
+
+          <li><a href="tags.html#angularjs">angularjs</a></li>
+
+          <li><a href="tags.html#google">google</a></li>
+
+				</ul>
+      </div>
+
+
+
+			<div class="centerad">
+				<script type="text/javascript">
+					if (window.innerWidth > 800) {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (normal) */
+		google_ad_slot = "4997781473";
+		google_ad_width = 728;
+		google_ad_height = 90;
+		} else {
+		google_ad_client = "ca-pub-5250935198625278";
+		/* joshua.themarshians.com (mobile) */
+		google_ad_slot = "7951247872";
+		google_ad_width = 320;
+		google_ad_height = 50;
+		}
+</script>
+<script type="text/javascript"
+				src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+<footer>
+	<p>
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			<img alt="Creative Commons License" 
+					 style="border-width:0" 
+					 src="http://i.creativecommons.org/l/by/3.0/us/80x15.png" />
+		</a>
+		<br />
+		This work is licensed under a 
+		<a rel="license" 
+			 href="http://creativecommons.org/licenses/by/3.0/us/">
+			Creative Commons Attribution 3.0 United States License
+		</a>.
+	</p>
+	<p>This site was generated with <a href="https://github.com/icub3d/goblog">goblog</a>.</p>
+</footer>
+</div>
+
+<!-- These are the scripts for syntax highlighting. -->
+<script 
+	 src="//cdnjs.cloudflare.com/ajax/libs/rainbow/1.1.8/js/rainbow.min.js ">
+</script>
+<script src="rainbow/js/language/generic.js"></script>
+
+<script src="rainbow/js/language/go.js"></script>
+
+<script src="rainbow/js/language/javascript.js"></script>
+
+
+<!-- Twitter Bootstrap. -->
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+
+<!-- Google Analytics. -->
+<script type="text/javascript">
+
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-37698200-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+
+</script>
+</body>
+</html>

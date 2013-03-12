@@ -115,6 +115,174 @@
 <div class="row">
 	<div class="span12">
 		
+		<h1><a href="hardcore-google-communicating-angularjs.html">Hardcore Google: RESTful Communication With AngularJS</a></h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2013-03-12
+			</small>
+		</p>
+
+		<!-- Title: Hardcore Google: RESTful Communication With AngularJS -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Description: I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to use AngularJS and get it communicating with Go. -->
+
+<!-- Tags: go,appengine,golang,angularjs,google -->
+
+<!-- Languages: go,javascript -->
+
+<p>This post is part of a series <em>Hardcore Google</em>. You can find other
+posts here:</p>
+
+<ul>
+<li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
+<li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
+<li><a href="hardcore-google-communicating-angularjs.html">RESTful Communication With AngularJS</a></li>
+</ul>
+
+<p>My history with <a href="http://en.wikipedia.org/wiki/JavaScript">JavaScript</a>
+goes back almost 15 years. Back then, working in the browser was was
+difficult. Eventually tools like <a href="http://jquery.com/">jQuery</a> came
+around and made the work somewhat simpler. It wasn&rsquo;t until I
+discovered <a href="http://angularjs.org/">AngularJS</a> though that I felt like
+JavaScript development had come out of adolescence. AngularJS does a
+great job at solving problems that professional engineers often find
+clunky with JavaScript &emdash; namely separating the
+<a href="http://en.wikipedia.org/wiki/HTML">HTML</a> and
+<a href="http://en.wikipedia.org/wiki/CSS">CSS</a> from the code that drives it,
+properly testing code, and developing rich, dynamic web
+applications. What I love about AngularJS as well is that it doesn&rsquo;t
+doesn&rsquo;t try to get away from using JavaScript but merely enhance it.</p>
+
+<p>Enough gushing though. If you are new to AngularJS, you can find great
+tutorials on their website or you can contact me directly. What I&rsquo;m
+interested in talking about today is how AngularJS interacts with web
+services, particularly
+<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>ful
+web services. In my
+<a href="hardcore-google-communicating-go.html">last post</a>, we got
+<a href="http://golang.org/">Go</a> to serve our web services. Now we just need
+our front end web app to communicate with that service.</p>
+
+<p>AngularJS provides two ways to wire up a back end. The simplest method
+is to use the
+<a href="http://docs.angularjs.org/api/ngResource.$resource">$resource</a>
+service. It provides a simple interface to a web service. If you need
+finer grained control though, you can use the
+<a href="http://docs.angularjs.org/api/ng.$http">$http</a> service. I&rsquo;ll show you
+below how to use the <em>$http</em> service because that&rsquo;s what I ended up
+going with. If you decide to use the <em>$resource</em> service though, just
+keep in mind that it currently always strips the trailing slash wether
+you ask it to or not. You&rsquo;ll need to have your
+<a href="http://golang.org/pkg/net/http/">http.Handler</a>s account for that. For
+example:</p>
+
+<pre><code data-language="go">func fooHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "Thanks for the %s!", r.Method)
+}
+
+// Handle /foo
+http.HandleFunc("/foo", fooHandler)
+
+// Or Handle /foo/
+http.HandleFunc("/foo/", fooHandler)
+</code></pre>
+
+<p>Before, we go about using the <em>$http</em> service though, we need to talk
+about services in general. Like the <em>$http</em> and <em>$resource</em> services
+that AngularJS provides, you can create your own. Services are a great
+way to decouple code such as connecting to a web service. You can
+<a href="http://en.wikipedia.org/wiki/Mock_object">mock</a> them when you are
+testing the parts of your application that use them and AngularJS will
+manage the instantiation and destruction of the services for you. You
+can find a complete example of a user defined service in the file
+<a href="https://github.com/icub3d/home/blob/master/dev/js/rest/lists.js">list.js</a>.</p>
+
+<p>Let&rsquo;s walk through the create function. It handles the creation of new
+lists or making copies of existing lists. We start by making a <em>POST</em>
+using the <em>$http</em> service.</p>
+
+<pre><code data-language="javascript">var promise = $http.post("/rest/list/", data);
+</code></pre>
+
+<p>This performs an HTTP POST to the URL <em>&rdquo;/rest/list/&rdquo;</em> with the JSON
+data as the content of the POST. There are similar functions for
+<em>put</em>, <em>get</em>, and <em>delete</em> that correspond to the HTTP <em>PUT</em>, <em>GET</em>
+and <em>DELETE</em> methods. The data could technically be anything. In this
+case though, it&rsquo;s a JavaScript object that contains the information
+necessary to create the new list. AngularJS will take care of
+converting the object into JSON that our Go web service can consume.</p>
+
+<p>The <a href="http://wiki.commonjs.org/wiki/Promises">promise</a> returned allows
+you to hook a success and failure function to the asynchronous
+response to the request. Here, we call the <em>scall</em> or <em>ecall</em>
+functions based on the success or failure of the <em>POST</em>. A similar
+thing happens in all the other functions for the service. In the <em>get</em>
+function, for example, we do the same thing. The only thing that
+differs is that we expect a key for the list being retrieved.</p>
+
+<pre><code data-language="javascript">this.get = function(key, scall, ecall) {
+    var promise = $http.get("/rest/list/" + key + "/");
+    ...
+</code></pre>
+
+<p>You can see an example of using both of these functions and the
+service in the
+<a href="https://github.com/icub3d/home/blob/master/dev/js/lists/all.js">all.js</a>
+file in the <em>$scope.copy</em> function:</p>
+
+<pre><code data-language="javascript">$scope.copy = function() {
+    Lists.get($scope.data.key, function(l) {
+        l.Name = $scope.data.name;
+        Lists.create(l, function(nl) {
+                $location.path('/lists/view/' + nl.Key + '/');
+        });
+    });
+};
+</code></pre>
+
+<p>The goal of the <em>copy</em> function is to make a copy of a list with a new
+name. We do that by <em>get*ting the list to be copied by its key. If
+that succeeds, we change the list name and call the *create</em> function
+for that list. If it succeeds, then we redirect to the new list.</p>
+
+<p>I like this function because it shows the simplicity of using
+AngularJS&rsquo;s frameworks. I can make two service calls in just a few
+lines of code to do something meaningful with the application. It also
+exemplifies the notion of &ldquo;going with the flow.&rdquo; Most libraries or
+programming languages have a right and wrong way of doing things. If
+you do it the right way, you can get a lot of functionality with just
+a few lines of code. This makes your code both easier to read and
+maintain.</p>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+				<li><a href="tags.html#appengine">appengine</a></li>
+				
+				<li><a href="tags.html#golang">golang</a></li>
+				
+				<li><a href="tags.html#angularjs">angularjs</a></li>
+				
+				<li><a href="tags.html#google">google</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+<div class="row">
+	<div class="span12">
+		
 		<h1><a href="hardcore-google-communicating-go.html">Hardcore Google: RESTful Web Services In Go</a></h1>
 		
 
@@ -140,6 +308,7 @@ posts here:</p>
 <ul>
 <li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
 <li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
+<li><a href="hardcore-google-communicating-angularjs.html">RESTful Communication With AngularJS</a></li>
 </ul>
 
 <p>When you first start developing a web application, one of the first
@@ -325,6 +494,7 @@ posts here:</p>
 <ul>
 <li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
 <li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
+<li><a href="hardcore-google-communicating-angularjs.html">RESTful Communication With AngularJS</a></li>
 </ul>
 
 <p>I recently began a project using <a href="http://golang.org/">Go</a>,
@@ -506,151 +676,6 @@ hesitate to enter an issue or make a
 </div>
 <hr>
 
-<div class="row">
-	<div class="span12">
-		
-		<h1><a href="go-cross-compilers-linux.html">Cross Compiling Go Applications</a></h1>
-		
-
-		<p>
-			<small id="entry-date">
-				2013-01-31
-			</small>
-		</p>
-
-		<!-- Title: Cross Compiling Go Applications -->
-
-<!-- Author: Joshua Marsh -->
-
-<!-- Tags: go,arch -->
-
-<!-- Languages: go,shell -->
-
-<p>In a recent discussion on
-<a href="https://plus.google.com/communities/114112804251407510571">Go&rsquo;s Google Plus Community</a>,
-some questions came up about cross compiling. In a default
-installation of <a href="http://golang.org/">Go</a>, cross compiling is not
-enabled. It only builds to toolchains for your current operating
-system and architecture. Since all of my computers are <em>amd64</em>, but
-some of the applications I build need to run on <em>i386</em>, I thought I&rsquo;d
-share how I go about doing it.</p>
-
-<p>I use <a href="https://www.archlinux.org/">Arch</a> linux, so I have provided a
-package in
-<a href="https://aur.archlinux.org/packages/go-cross-compilers-linux/">AUR</a>
-for doing this. It makes setup extremely simply. You can install the
-package by doing the following:</p>
-
-<pre><code data-language="shell">$ wget https://aur.archlinux.org/packages/go/go-cross-compilers-linux/PKGBUILD
-$ makepkg
-
-$ # For amd64
-$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-x86_64.pkg.tar.xz
-
-$ # For i386
-$ sudo pacman -U go-cross-compilers-linux-1.0.3-1-i686.pkg.tar.xz
-</code></pre>
-
-<p>Now that the other toolchain is in place, we can make a sample program
-to test it out:</p>
-
-<pre><code data-language="go">package main
-
-import (
-    "fmt"
-)
-
-func main() {
-    fmt.Println("Hello world!")
-}
-</code></pre>
-
-<p>If you were building it for your own architecture, something as simple
-as the following would work:</p>
-
-<pre><code data-language="shell">$ go build main.go
-$ ./main
-Hello world!
-</code></pre>
-
-<p>Building for the other architecture isn&rsquo;t much more difficult. Go will
-cross compile other operating systems and architectures based on the
-environmental variables <em>GOOS</em> and <em>GOOARCH</em>. In our case, we are
-interested in changing <em>GOARCH</em>:</p>
-
-<pre><code data-language="shell">$ GOARCH=386 go build main.go
-</code></pre>
-
-<p>Now you can copy main over your <em>i386</em> machine and run it! If you were
-cross compiling to <em>amd64</em>, you&rsquo;d simply replace <em>386</em> with <em>amd64</em>.</p>
-
-<p>One last interesting tidbit is that if you have a version of
-<a href="http://gcc.gnu.org/">gcc</a> that will cross compile, then Go
-applications that link to C libraries can also be used (despite what
-many people have suggested). In Arch, you can install a cross
-compiling version of <em>gcc</em> like this:</p>
-
-<pre><code data-language="shell">$ sudo pacman -S gcc-multilib
-</code></pre>
-
-<p>In this example, I&rsquo;m going to test a <a href="http://www.sqlite.org/">sqlite3</a>
-library, so let&rsquo;s install the 32-bit libraries:</p>
-
-<pre><code data-language="shell">$ sudo pacman -S lib32-sqlite
-</code></pre>
-
-<p>Now, we let&rsquo;s build a small app with the example from
-<a href="https://github.com/mattn/go-sqlite3">go-sqlite3</a>:</p>
-
-<pre><code data-language="shell">$ go get github.com/mattn/go-sqlite3
-$ mkdir testsql
-$ cd testsql
-$ wget https://raw.github.com/mattn/go-sqlite3/master/example/main.go
-
-$ # Test the program locally to make sure it works.
-$ go run main.go
-
-$ # Build for i386
-GOARCH=386 go build
-
-$ # Verify it's linked against the right libraries (lib32).
-$ ldd testsql
-    linux-gate.so.1 (0xf77ba000)
-    libsqlite3.so.0 => /usr/lib32/libsqlite3.so.0 (0xf76e2000)
-    libpthread.so.0 => /usr/lib32/libpthread.so.0 (0xf76c7000)
-    libc.so.6 => /usr/lib32/libc.so.6 (0xf7516000)
-    libdl.so.2 => /usr/lib32/libdl.so.2 (0xf7511000)
-    /lib/ld-linux.so.2 (0xf77bb000)
-
-$ # Test is on i386.
-scp testsql jmarsh@i386-box:
-ssh jmarsh@i386-box
-./testsql﻿
-</code></pre>
-
-<p>Obviously this could all be alleviated by using virtual machines, but
-the ability of the go toolchain to do this on a single system is
-really powerful. I can&rsquo;t begin to express how useful this is on many
-of the projects I&rsquo;ve worked on. I&rsquo;m always looking to improve, so if
-you can see ways to improve my PKGBUILD file or if you&rsquo;ve found a
-simpler way to do something, let me know.</p>
-
-
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-				<li><a href="tags.html#arch">arch</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
-
 
 <p><a href="archives.html">More...</a></p>
 
@@ -701,6 +726,8 @@ simpler way to do something, let me know.</p>
 <script src="rainbow/js/language/generic.js"></script>
 
 <script src="rainbow/js/language/go.js"></script>
+
+<script src="rainbow/js/language/javascript.js"></script>
 
 <script src="rainbow/js/language/shell.js"></script>
 

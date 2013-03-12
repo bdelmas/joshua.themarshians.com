@@ -9,6 +9,7 @@ posts here:
 
 * [Unit Testing App Engine](hardcore-google-unit-testing.html)
 * [RESTful Web Services In Go](hardcore-google-communicating-go.html)
+* [RESTful Communication With AngularJS](hardcore-google-communicating-angularjs.html)
 
 I recently began a project using [Go](http://golang.org/),
 [AngularJS](http://angularjs.org/), and

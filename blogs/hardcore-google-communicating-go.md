@@ -9,6 +9,7 @@ posts here:
 
 * [Unit Testing App Engine](hardcore-google-unit-testing.html)
 * [RESTful Web Services In Go](hardcore-google-communicating-go.html)
+* [RESTful Communication With AngularJS](hardcore-google-communicating-angularjs.html)
 
 When you first start developing a web application, one of the first
 big decision you make after choosing your tool set is how these tools

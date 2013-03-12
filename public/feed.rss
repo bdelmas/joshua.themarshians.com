@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <lastBuildDate>17 Feb 13 09:24 MST</lastBuildDate> 
+    <lastBuildDate>12 Mar 13 09:43 MDT</lastBuildDate> 
     <title>Non Impediti Ratione Cogitationis</title>
 		<link>http://joshua.themarshians.com/</link>
 		<description>
@@ -22,6 +22,17 @@
 		</image>
 		<language>en-us</language>
  
+    <item>
+      <title>Hardcore Google: RESTful Communication With AngularJS</title>
+      <link>http://joshua.themarshians.com/hardcore-google-communicating-angularjs.html</link>
+      <description>I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to use AngularJS and get it communicating with Go.</description>
+      <pubDate>12 Mar 13 09:40 MDT</pubDate>
+      <category>go</category>
+      <category>appengine</category>
+      <category>golang</category>
+      <category>angularjs</category>
+      <category>google</category>
+    </item>
     <item>
       <title>Hardcore Google: RESTful Web Services In Go</title>
       <link>http://joshua.themarshians.com/hardcore-google-communicating-go.html</link>
@@ -100,16 +111,6 @@
       <pubDate>12 Aug 12 00:00 MDT</pubDate>
       <category>wicked</category>
       <category>america</category>
-    </item>
-    <item>
-      <title>Determining Determinism</title>
-      <link>http://joshua.themarshians.com/determining-determinism.html</link>
-      <description></description>
-      <pubDate>03 Aug 12 00:00 MDT</pubDate>
-      <category>determinism</category>
-      <category>memoization</category>
-      <category>go</category>
-      <category>recursion</category>
     </item>
 
   </channel>
