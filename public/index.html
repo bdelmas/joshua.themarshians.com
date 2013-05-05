@@ -115,6 +115,86 @@
 <div class="row">
 	<div class="span12">
 		
+		<h1><a href="dont-reinvent-the-wheel.html">Don't Reinvent the Wheel</a></h1>
+		
+
+		<p>
+			<small id="entry-date">
+				2013-05-05
+			</small>
+		</p>
+
+		<!-- Title: Don't Reinvent the Wheel -->
+
+<!-- Author: Joshua Marsh -->
+
+<!-- Description: After presenting at and attending OpenWest, the best thing I got out of it was, "don't reinvent the wheel."
+<!-- Tags: linux,go,angularjs,appengine  -->
+
+<p>This last week, I had the opportunity to attend the
+<a href="http://www.openwest.org/">OpenWest</a> conference. I can&rsquo;t say enough
+about how amazing it was. If you have the opportunity next year to
+attend, you should definitely do it! During the conference, I was able
+to <a href="http://joind.in/talk/view/8316">present</a> on some of my recent blog
+posts. I was also able to attend a session and a keynote from
+<a href="http://en.wikipedia.org/wiki/Rasmus_Lerdorf">Rasmus Lerdorf</a> and many
+other really smart people. I felt like everyone came together with a
+common goal of sharing the knowledge they had and learning from the
+experience of others.</p>
+
+<p>If I had to list the most important thing I got out of it, it would be
+&ldquo;don&rsquo;t reinvent the wheel.&rdquo; As is the case with many hackers, I often
+find myself with a chip on my shoulder. I see some open source program
+or piece of code and immediately think, &ldquo;I could do it better.&rdquo; The
+reality is that while I might be able to do it better, the time and
+effort involved in doing it better takes time away from bringing my
+own new ideas to fruition.</p>
+
+<p>While there are cases where it&rsquo;s worthwhile to rewrite something
+yourself, they definitely should not be a regular part of your
+programming. The beauty of open source software is that we can
+leverage the work that someone else has already done. This enables us
+to make our ideas reality at a faster pace than in the propietary
+world.</p>
+
+<p>The goal of my presentation was to provide a perfect example of
+this. By leveraging the work already done by really smart people, I
+was able to take an <a href="https://github.com/icub3d/home">idea</a> (albiet a
+small one) and have a working concept in just a couple of weekends
+worth of work. If I had tried to do the same project without
+<a href="http://angularjs.org/">AngularJS</a>, <a href="http://golang.org/">Go</a>, and
+<a href="https://developers.google.com/appengine/">App Engine</a> it would have
+easily taken months.</p>
+
+<p>In the open source world we have the opportunity to stand on the
+shoulders of
+giants<sup><a href="http://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">1</a></sup>. Let&rsquo;s
+use that opportunity to our advantage and accelerate the rate of
+innovation.</p>
+
+
+		
+		<div class="tags">
+			<ul>
+				
+				<li><a href="tags.html#linux">linux</a></li>
+				
+				<li><a href="tags.html#go">go</a></li>
+				
+				<li><a href="tags.html#angularjs">angularjs</a></li>
+				
+				<li><a href="tags.html#appengine">appengine</a></li>
+				
+			</ul>
+		</div>
+		
+	</div>
+</div>
+<hr>
+
+<div class="row">
+	<div class="span12">
+		
 		<h1><a href="hardcore-google-communicating-angularjs.html">Hardcore Google: RESTful Communication With AngularJS</a></h1>
 		
 
@@ -288,7 +368,7 @@ maintain.</p>
 
 		<p>
 			<small id="entry-date">
-				2013-02-16
+				2013-02-16 (Updated: 2013-03-12)
 			</small>
 		</p>
 
@@ -466,216 +546,6 @@ JSON we are sending back.</p>
 </div>
 <hr>
 
-<div class="row">
-	<div class="span12">
-		
-		<h1><a href="hardcore-google-unit-testing.html">Hardcore Google: Unit Testing App Engine</a></h1>
-		
-
-		<p>
-			<small id="entry-date">
-				2013-02-10 (Updated: 2013-02-16)
-			</small>
-		</p>
-
-		<!-- Title: Hardcore Google: Unit Testing App Engine -->
-
-<!-- Author: Joshua Marsh -->
-
-<!-- Description: I recently began a project using Go, AngularJS, and Google App Engine. In the first installment of a series of blog posts, I describe how I went about setting up unit testing for Google App Engine. -->
-
-<!-- Tags: go,appengine,golang,angularjs,google -->
-
-<!-- Languages: shell,go -->
-
-<p>This post is part of a series <em>Hardcore Google</em>. You can find other
-posts here:</p>
-
-<ul>
-<li><a href="hardcore-google-unit-testing.html">Unit Testing App Engine</a></li>
-<li><a href="hardcore-google-communicating-go.html">RESTful Web Services In Go</a></li>
-<li><a href="hardcore-google-communicating-angularjs.html">RESTful Communication With AngularJS</a></li>
-</ul>
-
-<p>I recently began a project using <a href="http://golang.org/">Go</a>,
-<a href="http://angularjs.org/">AngularJS</a>, and
-<a href="https://developers.google.com/appengine/">Google App Engine</a>. It is a
-personal web site I use at home to help keep my family organized. I&rsquo;ll
-talk more about it later in a series of posts. I&rsquo;m not actually
-completely finished with it yet, but I thought I&rsquo;d start this series.
-Some of the aspects of the project were interesting enough that I
-wanted to have a place where I could look back and remember how I did
-it. There may also be some people out there that get something out of
-it as well.</p>
-
-<p>First, let me explain why I picked Go, AngularJS and Google App
-Engine. I&rsquo;m a <a href="http://en.wikipedia.org/wiki/Do_it_yourself">DIY</a> sort
-of guys, and I&rsquo;m always fascinated with trying different things. The
-bulk of my work life revolves around <a href="http://www.python.org/">Python</a>,
-<a href="http://php.net/">PHP</a>,
-<a href="http://en.wikipedia.org/wiki/C_(programming_language">C</a>, and
-<a href="http://www.perl.org/">Perl</a>. These are cool languages and I can do
-awesome things with them, but they aren&rsquo;t <em>new</em> and <em>exciting</em> to me
-anymore.</p>
-
-<p>Go and AngularJS seem to be the new kids on the block that are getting
-a lot of attention in my circles. I&rsquo;ve already posted quite a bit
-about Go. I haven&rsquo;t done a major project with it yet though, so I
-thought this would be a good opportunity. I also recently came across
-AngularJS and was impressed with the way it allows you to abstract the
-presentation with the application logic. I&rsquo;ve never been more
-interested in <a href="http://en.wikipedia.org/wiki/JavaScript">JavaScript</a>
-before.</p>
-
-<p>I wanted to find a place I could host my code for free and not limit
-it to a server running in my home. The project would be extremely
-useful on the go with my table or phone. App Engine seemed like the
-best place for this because I&rsquo;d likely never go over the free daily
-quotas. Since Go is supported, it seemed like a good fit in that
-respect as well. I already use
-<a href="http://www.google.com/intl/en/enterprise/apps/business/">Google Apps</a>,
-so I could manage authentication through that and wouldn&rsquo;t need to
-design any of that logic.</p>
-
-<p>And with that, I officially became a Google
-<a href="http://www.urbandictionary.com/define.php?term=fanboi">fanboi</a> for
-this project. I&rsquo;ll talk more about the architecture in another post,
-but I used App Engine to server my static content and server my
-<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>ful
-interface built in Go. The website, when minified is just one web
-page, one CSS file, and one JavaScript file. It communicates to a
-simple REST service to retrieve the data it needs for presentation.</p>
-
-<p>One of the problems I ran into quickly was the ability to
-<a href="http://en.wikipedia.org/wiki/Unit_testing">unit test</a> my code. This
-project is a bit more than just a few files, so unit testing was going
-to be important. I find that for these large projects if I can write
-unit tests I can iteratively develop parts of the system without
-needing the others to make sure my code works as expected. Creating
-unit tests in go is fairly simple. The
-<a href="http://golang.org/cmd/go/">go tool</a> has a test command and the
-<a href="http://golang.org/pkg/testing/">testing package</a> provides you with
-just about everything you need.</p>
-
-<p>Testing code that relies on the <em>appengine</em> package is more difficult
-though. You need some sort of
-<a href="http://en.wikipedia.org/wiki/Mock_object">mock object</a> for the
-appengine to make any sort of testing possible. I found a package by
-<a href="http://bradfitz.com/">Brad Fitzpatrick</a> called
-<a href="http://code.google.com/p/gae-go-testing/">gae-go-testing</a>. It was a
-bit outdated though and didn&rsquo;t contain all the features I was looking
-for. <a href="http://en.wikipedia.org/wiki/Open_source">Open source</a> to the
-rescue! I forked the repository and got it working. You can see and
-use the forked package at
-<a href="https://github.com/icub3d/appenginetesting">github.com/icub3d/appenginetesting</a>.</p>
-
-<p>The basic premise is to spin up a temporary App Engine instance
-locally and then use it with some hooks to simulate typical App Engine
-functionality. To use it, you need to already have the
-<a href="https://developers.google.com/appengine/downloads">App Engine SDK installed</a>. With
-that done, we just need to do some minor setup work before we run our
-tests:</p>
-
-<pre><code data-language="shell">export APPENGINE_SDK=/path/to/google_appengine
-export PATH=$PATH:$APPENGINE_SDK
-cd ~/go/src
-ln -s $APPENGINE_SDK/goroot/src/pkg/appengine
-ln -s $APPENGINE_SDK/goroot/src/pkg/appengine_internal
-go get github.com/icub3d/appenginetesting
-</code></pre>
-
-<p>With that done, we should now be able to perform some basic App Engine
-functions in our tests. For example:</p>
-
-<pre><code data-language="go">// Create mocked context.
-c, err := appenginetesting.NewContext(nil)
-if err != nil {
-    fmt.Println("initilizing context:", err)
-    return
-}
-
-// Close the context when we are done.
-defer c.Close()
-
-// Get an element from the datastore.
-k := datastore.NewKey(c, "Entity", "stringID", 0, nil)
-e := ""
-if err := datastore.Get(c, k, &e); err != nil {
-    fmt.Println("datastore get:", err)
-    return
-}
-
-// Put an element in the datastore.
-if _, err := datastore.Put(c, k, &e); err != nil {
-    fmt.Println("datastore put:", err)
-    return
-}
-</code></pre>
-
-<p>We create a new <em>Context</em> using the <em>appenginetesting.NewContext</em>
-function. This call spins up a temporary instance of the App Engine
-development server. We can then use it like we would a real <em>Context</em>
-and perform normal data store queries.</p>
-
-<p>One feature that was missing was the ability to fetch user information
-from the <em>Context</em>. Adding it was fairly straight forward. You can use
-it&rsquo;s functionality like this:</p>
-
-<pre><code data-language="go">// Create mocked context.
-c, err := appenginetesting.NewContext(nil)
-if err != nil {
-    fmt.Println("initilizing context:", err)
-    return
-}
-
-// Close the context when we are done.
-defer c.Close()
-
-// Log a user in.
-c.Login("test@example.com", true)
-
-// Get the user.
-u := user.Current(c)
-if u == nil {
-    fmt.Println("we didn't get a user!")
-    return
-}
-
-fmt.Println("Email:", u.Email)
-fmt.Println("Admin:", u.Admin)
-</code></pre>
-
-<p>With all of this setup, it is now extremely simply for me to write
-test cases against my App Engine related code. Hopefully you&rsquo;ll find
-this helpful in your App Engine projects using Go. You can see the
-full documentation on
-<a href="http://godoc.org/github.com/icub3d/appenginetesting">godoc</a>. There is
-still room for improvement, so if you have feature requests, don&rsquo;t
-hesitate to enter an issue or make a
-<a href="https://github.com/icub3d/appenginetesting/pulls">pull request</a>.</p>
-
-
-		
-		<div class="tags">
-			<ul>
-				
-				<li><a href="tags.html#go">go</a></li>
-				
-				<li><a href="tags.html#appengine">appengine</a></li>
-				
-				<li><a href="tags.html#golang">golang</a></li>
-				
-				<li><a href="tags.html#angularjs">angularjs</a></li>
-				
-				<li><a href="tags.html#google">google</a></li>
-				
-			</ul>
-		</div>
-		
-	</div>
-</div>
-<hr>
-
 
 <p><a href="archives.html">More...</a></p>
 
@@ -728,8 +598,6 @@ hesitate to enter an issue or make a
 <script src="rainbow/js/language/go.js"></script>
 
 <script src="rainbow/js/language/javascript.js"></script>
-
-<script src="rainbow/js/language/shell.js"></script>
 
 
 <!-- Twitter Bootstrap. -->
