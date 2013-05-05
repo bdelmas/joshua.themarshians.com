@@ -26,12 +26,12 @@ While there are cases where it's worthwhile to rewrite something
 yourself, they definitely should not be a regular part of your
 programming. The beauty of open source software is that we can
 leverage the work that someone else has already done. This enables us
-to make our ideas reality at a faster pace than in the propietary
+to make our ideas reality at a faster pace than in the proprietary
 world.
 
 The goal of my presentation was to provide a perfect example of
 this. By leveraging the work already done by really smart people, I
-was able to take an [idea](https://github.com/icub3d/home) (albiet a
+was able to take an [idea](https://github.com/icub3d/home) (albeit a
 small one) and have a working concept in just a couple of weekends
 worth of work. If I had tried to do the same project without
 [AngularJS](http://angularjs.org/), [Go](http://golang.org/), and
