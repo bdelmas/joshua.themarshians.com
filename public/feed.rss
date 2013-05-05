@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <lastBuildDate>05 May 13 13:56 MDT</lastBuildDate> 
+    <lastBuildDate>05 May 13 14:29 MDT</lastBuildDate> 
     <title>Non Impediti Ratione Cogitationis</title>
 		<link>http://joshua.themarshians.com/</link>
 		<description>
@@ -26,7 +26,7 @@
       <title>Don't Reinvent the Wheel</title>
       <link>http://joshua.themarshians.com/dont-reinvent-the-wheel.html</link>
       <description></description>
-      <pubDate>05 May 13 13:56 MDT</pubDate>
+      <pubDate>05 May 13 13:58 MDT</pubDate>
       <category>linux</category>
       <category>go</category>
       <category>angularjs</category>
