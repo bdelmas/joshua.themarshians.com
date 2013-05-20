@@ -1,6 +1,6 @@
 <!-- Title: Don't Reinvent the Wheel -->
 <!-- Author: Joshua Marsh -->
-<!-- Description: After presenting at and attending OpenWest, the best thing I got out of it was, "don't reinvent the wheel."
+<!-- Description: After presenting at and attending OpenWest, the best thing I got out of it was, "don't reinvent the wheel." -->
 <!-- Tags: linux,go,angularjs,appengine  -->
 
 This last week, I had the opportunity to attend the

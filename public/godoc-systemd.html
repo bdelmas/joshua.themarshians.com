@@ -2,9 +2,9 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Don't Reinvent the Wheel</title>
+		<title>Hosting Your Own Godoc</title>
 		
-		<meta name="description" content="After presenting at and attending OpenWest, the best thing I got out of it was, "don't reinvent the wheel."">
+		<meta name="description" content="I sometimes find it useful to host my own version of golang.org. Let's learn how to do that.">
 		
 		
 		<meta name="author" content="Joshua Marsh">
@@ -116,63 +116,111 @@
 			</div>
 
 			
-      <h1>Don't Reinvent the Wheel</h1>
+      <h1>Hosting Your Own Godoc</h1>
 
 
       <p>
 				<small id="entry-date">
-					2013-05-05 (Updated: 2013-05-05)
+					2013-05-20
 				</small>
 			</p>
 
-<!-- Title: Don't Reinvent the Wheel -->
+<!-- Title: Hosting Your Own Godoc -->
 
 <!-- Author: Joshua Marsh -->
 
-<!-- Description: After presenting at and attending OpenWest, the best thing I got out of it was, "don't reinvent the wheel." -->
+<!-- Description: I sometimes find it useful to host my own version of golang.org. Let's learn how to do that. -->
 
-<!-- Tags: linux,go,angularjs,appengine  -->
+<!-- Tags: linux,go,arch  -->
 
-<p>This last week, I had the opportunity to attend the
-<a href="http://www.openwest.org/">OpenWest</a> conference. I can&rsquo;t say enough
-about how amazing it was. If you have the opportunity next year to
-attend, you should definitely do it! During the conference, I was able
-to <a href="http://joind.in/talk/view/8316">present</a> on some of my recent blog
-posts. I was also able to attend a session and a keynote from
-<a href="http://en.wikipedia.org/wiki/Rasmus_Lerdorf">Rasmus Lerdorf</a> and many
-other really smart people. I felt like everyone came together with a
-common goal of sharing the knowledge they had and learning from the
-experience of others.</p>
+<p>One of the biggest reasons to use <a href="http://golang.org/">Go</a> is its
+great tooling. <a href="http://golang.org/cmd/godoc/">Godoc</a> is one of those
+tools and it makes documentation so simple that you&rsquo;ll be wanting to
+document your code instead of dreading it. Besides having a command
+line interface for displaying documentation, it can also start an HTTP
+Server. <a href="http://golang.org/">Golang.org</a> is a public version of this
+for the standard packages. <a href="http://godoc.org/">GoDoc</a> does a similar
+thing for public packages.</p>
 
-<p>If I had to list the most important thing I got out of it, it would be
-&ldquo;don&rsquo;t reinvent the wheel.&rdquo; As is the case with many hackers, I often
-find myself with a chip on my shoulder. I see some open source program
-or piece of code and immediately think, &ldquo;I could do it better.&rdquo; The
-reality is that while I might be able to do it better, the time and
-effort involved in doing it better takes time away from bringing my
-own new ideas to fruition.</p>
+<p>I have some private repositories though that I host internally and
+I&rsquo;ve always wanted to be able to view the package documentation. There
+are at least a couple of ways to accomplish this. First, if you simply
+want to host it your local machine, godoc can do that for you:</p>
 
-<p>While there are cases where it&rsquo;s worthwhile to rewrite something
-yourself, they definitely should not be a regular part of your
-programming. The beauty of open source software is that we can
-leverage the work that someone else has already done. This enables us
-to make our ideas reality at a faster pace than in the proprietary
-world.</p>
+<pre><code>$ godoc -http=:6060
+</code></pre>
 
-<p>The goal of my presentation was to provide a perfect example of
-this. By leveraging the work already done by really smart people, I
-was able to take an <a href="https://github.com/icub3d/home">idea</a> (albeit a
-small one) and have a working concept in just a couple of weekends
-worth of work. If I had tried to do the same project without
-<a href="http://angularjs.org/">AngularJS</a>, <a href="http://golang.org/">Go</a>, and
-<a href="https://developers.google.com/appengine/">App Engine</a> it would have
-easily taken months.</p>
+<p>This will create an HTTP web server that listens on port <em>6060</em> and
+serves up the standard documentation as well as anything in your
+<em>GOPATH</em>.</p>
 
-<p>In the open source world we have the opportunity to stand on the
-shoulders of
-giants<sup><a href="http://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">1</a></sup>. Let&rsquo;s
-use that opportunity to our advantage and accelerate the rate of
-innovation.</p>
+<p>What I&rsquo;ve always wanted to do though is have it run on the server
+that&rsquo;s hosting all my repositories. I finally spent some time getting
+this working and it turns out to be quite simple. Since the HTTP
+Server is already built, we just need a way to get the system to
+recognize it as a service. I use
+<a href="https://www.archlinux.org/">Arch Linux</a> and
+<a href="http://www.freedesktop.org/wiki/Software/systemd/">systemd</a> is the
+default service manager. If you use something else, I&rsquo;m guessing this
+should translate fairly easily to the other services.</p>
+
+<p>Since systemd can manage starting and stopping services using signals,
+we really just need to tell systemd how to start up the godoc
+server. Here is the
+<a href="https://github.com/icub3d/godoc-systemd/blob/master/godoc.service">godoc.service</a>
+file in full:</p>
+
+<pre><code>[Unit]
+Description=Go Documentation
+Wants=network.target
+
+[Service]
+Environment=GOPATH=/srv/go/ GOROOT=/usr/lib/go/
+ExecStart=/usr/bin/godoc -index -http=:6060
+RestartSec=30
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<p>The meat of the configuration is <em>ExecStart</em>. It is simply a call to
+godoc with the <em>-http</em> parameter. I added <em>-index</em> so that the
+documentation could be searched. I thought this would be useful since
+it&rsquo;s intended to be online full-time.</p>
+
+<p>One thing to note, I set the <em>GOPATH</em> to <em>/srv/go</em>. Since systemd
+doesn&rsquo;t otherwise load environment variables, the <em>GOPATH</em> would not
+normally be set. You can change that path to your actual <em>GOPATH</em>. I
+simply used a symbolic link to my actual go repositories.</p>
+
+<p>Copy your service file to a place where system will recognize it:</p>
+
+<pre><code>$ sudo cp godoc.service /etc/systemd/system
+</code></pre>
+
+<p>That&rsquo;s all there is to it! I now have a fully functional, locally
+hosted Go documentation web site. I use it like golang.org, but it
+also searches and displays my private packages. I can use it like any
+other systemd service:</p>
+
+<pre><code>$ sudo systemctl enable godoc.service # Start at boot.
+$ sudo systemctl {start,stop,restart} godoc.service
+</code></pre>
+
+<p>If you are using Arch Linux, I made an
+<a href="https://aur.archlinux.org/">AUR</a> package named
+<a href="https://aur.archlinux.org/packages/godoc-systemd/">godoc-systemd</a>. You
+can install it like you would any other AUR package:</p>
+
+<pre><code>$ wget https://aur.archlinux.org/packages/go/godoc-systemd/PKGBUILD
+$ makepkg
+$ sudo pacman -U godoc-systemd-1.0-1-any.pkg.tar.xz
+</code></pre>
+
+<p>I can&rsquo;t say enough about how impressed I am with the tooling built for
+Go. Godoc is only one of many and it is a good example of how useful,
+extendable, and manageable the go tools are.</p>
 
 
 
@@ -183,9 +231,7 @@ innovation.</p>
 
           <li><a href="tags.html#go">go</a></li>
 
-          <li><a href="tags.html#angularjs">angularjs</a></li>
-
-          <li><a href="tags.html#appengine">appengine</a></li>
+          <li><a href="tags.html#arch">arch</a></li>
 
 				</ul>
       </div>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <lastBuildDate>05 May 13 14:29 MDT</lastBuildDate> 
+    <lastBuildDate>20 May 13 11:44 MDT</lastBuildDate> 
     <title>Non Impediti Ratione Cogitationis</title>
 		<link>http://joshua.themarshians.com/</link>
 		<description>
@@ -23,9 +23,18 @@
 		<language>en-us</language>
  
     <item>
+      <title>Hosting Your Own Godoc</title>
+      <link>http://joshua.themarshians.com/godoc-systemd.html</link>
+      <description>I sometimes find it useful to host my own version of golang.org. Let's learn how to do that.</description>
+      <pubDate>20 May 13 11:40 MDT</pubDate>
+      <category>linux</category>
+      <category>go</category>
+      <category>arch</category>
+    </item>
+    <item>
       <title>Don't Reinvent the Wheel</title>
       <link>http://joshua.themarshians.com/dont-reinvent-the-wheel.html</link>
-      <description></description>
+      <description>After presenting at and attending OpenWest, the best thing I got out of it was, "don't reinvent the wheel."</description>
       <pubDate>05 May 13 13:58 MDT</pubDate>
       <category>linux</category>
       <category>go</category>
@@ -106,13 +115,6 @@
       <pubDate>23 Dec 12 00:00 MST</pubDate>
       <category>git</category>
       <category>go</category>
-    </item>
-    <item>
-      <title>America Is Falling For It</title>
-      <link>http://joshua.themarshians.com/america-is-falling-for-it.html</link>
-      <description></description>
-      <pubDate>23 Oct 12 00:00 MDT</pubDate>
-      <category>america</category>
     </item>
 
   </channel>
