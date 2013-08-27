@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <lastBuildDate>20 May 13 11:44 MDT</lastBuildDate> 
+    <lastBuildDate>27 Aug 13 15:08 MDT</lastBuildDate> 
     <title>Non Impediti Ratione Cogitationis</title>
 		<link>http://joshua.themarshians.com/</link>
 		<description>
@@ -26,7 +26,7 @@
       <title>Hosting Your Own Godoc</title>
       <link>http://joshua.themarshians.com/godoc-systemd.html</link>
       <description>I sometimes find it useful to host my own version of golang.org. Let's learn how to do that.</description>
-      <pubDate>20 May 13 11:40 MDT</pubDate>
+      <pubDate>20 May 13 11:45 MDT</pubDate>
       <category>linux</category>
       <category>go</category>
       <category>arch</category>
