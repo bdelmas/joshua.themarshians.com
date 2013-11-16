@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <lastBuildDate>27 Aug 13 15:08 MDT</lastBuildDate> 
+    <lastBuildDate>16 Nov 13 16:23 MST</lastBuildDate> 
     <title>Non Impediti Ratione Cogitationis</title>
 		<link>http://joshua.themarshians.com/</link>
 		<description>
@@ -23,10 +23,20 @@
 		<language>en-us</language>
  
     <item>
+      <title>Dynamic Server Management With Doozer and Groupcache</title>
+      <link>http://joshua.themarshians.com/doozer-groupcache.html</link>
+      <description>Groupcache provides a great way to cache data. Instances can be dynamically managed using software like Doozer.</description>
+      <pubDate>16 Nov 2013 16:23 MST</pubDate>
+      <category>go</category>
+      <category>golang</category>
+      <category>groupcache</category>
+      <category>doozer</category>
+    </item>
+    <item>
       <title>Hosting Your Own Godoc</title>
       <link>http://joshua.themarshians.com/godoc-systemd.html</link>
       <description>I sometimes find it useful to host my own version of golang.org. Let's learn how to do that.</description>
-      <pubDate>20 May 13 11:45 MDT</pubDate>
+      <pubDate>20 May 2013 11:45 MDT</pubDate>
       <category>linux</category>
       <category>go</category>
       <category>arch</category>
@@ -35,7 +45,7 @@
       <title>Don't Reinvent the Wheel</title>
       <link>http://joshua.themarshians.com/dont-reinvent-the-wheel.html</link>
       <description>After presenting at and attending OpenWest, the best thing I got out of it was, "don't reinvent the wheel."</description>
-      <pubDate>05 May 13 13:58 MDT</pubDate>
+      <pubDate>05 May 2013 13:58 MDT</pubDate>
       <category>linux</category>
       <category>go</category>
       <category>angularjs</category>
@@ -45,7 +55,7 @@
       <title>Hardcore Google: RESTful Communication With AngularJS</title>
       <link>http://joshua.themarshians.com/hardcore-google-communicating-angularjs.html</link>
       <description>I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to use AngularJS and get it communicating with Go.</description>
-      <pubDate>12 Mar 13 09:45 MDT</pubDate>
+      <pubDate>12 Mar 2013 09:45 MDT</pubDate>
       <category>go</category>
       <category>appengine</category>
       <category>golang</category>
@@ -56,7 +66,7 @@
       <title>Hardcore Google: RESTful Web Services In Go</title>
       <link>http://joshua.themarshians.com/hardcore-google-communicating-go.html</link>
       <description>I recently began a project using Go, AngularJS, and Google App Engine. In this installment of a series of blog posts, I describe how to get Go to be a robust RESTful web service.</description>
-      <pubDate>16 Feb 13 09:15 MST</pubDate>
+      <pubDate>16 Feb 2013 09:15 MST</pubDate>
       <category>go</category>
       <category>appengine</category>
       <category>golang</category>
@@ -67,7 +77,7 @@
       <title>Hardcore Google: Unit Testing App Engine</title>
       <link>http://joshua.themarshians.com/hardcore-google-unit-testing.html</link>
       <description>I recently began a project using Go, AngularJS, and Google App Engine. In the first installment of a series of blog posts, I describe how I went about setting up unit testing for Google App Engine.</description>
-      <pubDate>10 Feb 13 12:26 MST</pubDate>
+      <pubDate>10 Feb 2013 12:26 MST</pubDate>
       <category>go</category>
       <category>appengine</category>
       <category>golang</category>
@@ -78,7 +88,7 @@
       <title>Cross Compiling Go Applications</title>
       <link>http://joshua.themarshians.com/go-cross-compilers-linux.html</link>
       <description></description>
-      <pubDate>31 Jan 13 13:49 MST</pubDate>
+      <pubDate>31 Jan 2013 13:49 MST</pubDate>
       <category>go</category>
       <category>arch</category>
     </item>
@@ -86,7 +96,7 @@
       <title>Colds, Static Blogs, and Go</title>
       <link>http://joshua.themarshians.com/goblog.html</link>
       <description></description>
-      <pubDate>29 Jan 13 16:04 MST</pubDate>
+      <pubDate>29 Jan 2013 16:04 MST</pubDate>
       <category>go</category>
       <category>blog</category>
       <category>html</category>
@@ -95,7 +105,7 @@
       <title>Go App, Do You Read Me?</title>
       <link>http://joshua.themarshians.com/go-app-do-you-read-me.html</link>
       <description></description>
-      <pubDate>17 Jan 13 00:00 MST</pubDate>
+      <pubDate>17 Jan 2013 00:00 MST</pubDate>
       <category>rpc</category>
       <category>go</category>
       <category>linux</category>
@@ -104,16 +114,8 @@
       <title>Vim and Go</title>
       <link>http://joshua.themarshians.com/vim-and-go.html</link>
       <description></description>
-      <pubDate>09 Jan 13 00:00 MST</pubDate>
+      <pubDate>09 Jan 2013 00:00 MST</pubDate>
       <category>vim</category>
-      <category>go</category>
-    </item>
-    <item>
-      <title>Private Git Repos And Go</title>
-      <link>http://joshua.themarshians.com/private-git-repos-and-go.html</link>
-      <description></description>
-      <pubDate>23 Dec 12 00:00 MST</pubDate>
-      <category>git</category>
       <category>go</category>
     </item>
 
